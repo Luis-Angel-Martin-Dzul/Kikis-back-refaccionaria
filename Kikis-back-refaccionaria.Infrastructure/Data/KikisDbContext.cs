@@ -9,9 +9,27 @@ public partial class KikisDbContext : DbContext
 
     public KikisDbContext(DbContextOptions<KikisDbContext> options) : base(options) {}
 
+    public virtual DbSet<TbKit> TbKits { get; set; }
+
     public virtual DbSet<TbModule> TbModules { get; set; }
 
     public virtual DbSet<TbPermission> TbPermissions { get; set; }
+
+    public virtual DbSet<TbProduct> TbProducts { get; set; }
+
+    public virtual DbSet<TbProductBrand> TbProductBrands { get; set; }
+
+    public virtual DbSet<TbProductCategory> TbProductCategories { get; set; }
+
+    public virtual DbSet<TbProductHallway> TbProductHallways { get; set; }
+
+    public virtual DbSet<TbProductKit> TbProductKits { get; set; }
+
+    public virtual DbSet<TbProductLevel> TbProductLevels { get; set; }
+
+    public virtual DbSet<TbProductShelf> TbProductShelves { get; set; }
+
+    public virtual DbSet<TbProductSupplier> TbProductSuppliers { get; set; }
 
     public virtual DbSet<TbRol> TbRols { get; set; }
 
@@ -21,16 +39,22 @@ public partial class KikisDbContext : DbContext
 
     public virtual DbSet<TbSupplier> TbSuppliers { get; set; }
 
-    public virtual DbSet<TbTool> TbTools { get; set; }
-
-    public virtual DbSet<TbToolBrand> TbToolBrands { get; set; }
-
-    public virtual DbSet<TbToolCategory> TbToolCategories { get; set; }
-
     public virtual DbSet<TbUser> TbUsers { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.Entity<TbKit>(entity =>
+        {
+            entity.ToTable("TbKit");
+
+            entity.Property(e => e.Description)
+                .HasMaxLength(255)
+                .IsUnicode(false);
+            entity.Property(e => e.Name)
+                .HasMaxLength(75)
+                .IsUnicode(false);
+        });
+
         modelBuilder.Entity<TbModule>(entity =>
         {
             entity.ToTable("TbModule");
@@ -58,10 +82,148 @@ public partial class KikisDbContext : DbContext
                 .HasConstraintName("FK_TbPermission_TbRol");
         });
 
+        modelBuilder.Entity<TbProduct>(entity =>
+        {
+            entity.ToTable("TbProduct");
+
+            entity.Property(e => e.Barcode)
+                .HasMaxLength(15)
+                .IsUnicode(false);
+            entity.Property(e => e.Discount)
+                .HasDefaultValue(0m)
+                .HasColumnType("decimal(5, 2)");
+            entity.Property(e => e.IsActive).HasDefaultValue(true);
+            entity.Property(e => e.Name)
+                .HasMaxLength(100)
+                .IsUnicode(false);
+            entity.Property(e => e.Path)
+                .HasMaxLength(255)
+                .IsUnicode(false);
+            entity.Property(e => e.Price).HasColumnType("decimal(10, 2)");
+
+            entity.HasOne(d => d.BrandNavigation).WithMany(p => p.TbProducts)
+                .HasForeignKey(d => d.Brand)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_TbProduct_TbToolBrand");
+
+            entity.HasOne(d => d.CategoryNavigation).WithMany(p => p.TbProducts)
+                .HasForeignKey(d => d.Category)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_TbProduct_TbToolCategory");
+
+            entity.HasOne(d => d.HallwayNavigation).WithMany(p => p.TbProducts)
+                .HasForeignKey(d => d.Hallway)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_TbProduct_TbProductHallway");
+
+            entity.HasOne(d => d.LevelNavigation).WithMany(p => p.TbProducts)
+                .HasForeignKey(d => d.Level)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_TbProduct_TbProductLevel");
+
+            entity.HasOne(d => d.ShelfNavigation).WithMany(p => p.TbProducts)
+                .HasForeignKey(d => d.Shelf)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_TbProduct_TbProductShelf");
+        });
+
+        modelBuilder.Entity<TbProductBrand>(entity =>
+        {
+            entity.ToTable("TbProductBrand");
+
+            entity.Property(e => e.Description)
+                .HasMaxLength(255)
+                .IsUnicode(false);
+            entity.Property(e => e.Name)
+                .HasMaxLength(75)
+                .IsUnicode(false);
+        });
+
+        modelBuilder.Entity<TbProductCategory>(entity =>
+        {
+            entity.ToTable("TbProductCategory");
+
+            entity.Property(e => e.Description)
+                .HasMaxLength(255)
+                .IsUnicode(false);
+            entity.Property(e => e.Name)
+                .HasMaxLength(75)
+                .IsUnicode(false);
+        });
+
+        modelBuilder.Entity<TbProductHallway>(entity =>
+        {
+            entity.ToTable("TbProductHallway");
+
+            entity.Property(e => e.Description)
+                .HasMaxLength(255)
+                .IsUnicode(false);
+            entity.Property(e => e.Name)
+                .HasMaxLength(75)
+                .IsUnicode(false);
+        });
+
+        modelBuilder.Entity<TbProductKit>(entity =>
+        {
+            entity.ToTable("TbProductKit");
+
+            entity.HasOne(d => d.KitNavigation).WithMany(p => p.TbProductKits)
+                .HasForeignKey(d => d.Kit)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_TbProductKit_TbKitr");
+
+            entity.HasOne(d => d.ProductNavigation).WithMany(p => p.TbProductKits)
+                .HasForeignKey(d => d.Product)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_TbProductKit_TbProduct");
+        });
+
+        modelBuilder.Entity<TbProductLevel>(entity =>
+        {
+            entity.ToTable("TbProductLevel");
+
+            entity.Property(e => e.Description)
+                .HasMaxLength(255)
+                .IsUnicode(false);
+            entity.Property(e => e.Name)
+                .HasMaxLength(75)
+                .IsUnicode(false);
+        });
+
+        modelBuilder.Entity<TbProductShelf>(entity =>
+        {
+            entity.ToTable("TbProductShelf");
+
+            entity.Property(e => e.Description)
+                .HasMaxLength(255)
+                .IsUnicode(false);
+            entity.Property(e => e.Name)
+                .HasMaxLength(75)
+                .IsUnicode(false);
+        });
+
+        modelBuilder.Entity<TbProductSupplier>(entity =>
+        {
+            entity.ToTable("TbProductSupplier");
+
+            entity.HasOne(d => d.ProductNavigation).WithMany(p => p.TbProductSuppliers)
+                .HasForeignKey(d => d.Product)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_TbProductSupplier_TbProduct");
+
+            entity.HasOne(d => d.SupplierNavigation).WithMany(p => p.TbProductSuppliers)
+                .HasForeignKey(d => d.Supplier)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_TbProductSupplier_TbSupplier");
+        });
+
         modelBuilder.Entity<TbRol>(entity =>
         {
             entity.ToTable("TbRol");
 
+            entity.Property(e => e.Description)
+                .HasMaxLength(255)
+                .IsUnicode(false);
             entity.Property(e => e.Name)
                 .HasMaxLength(75)
                 .IsUnicode(false);
@@ -137,54 +299,6 @@ public partial class KikisDbContext : DbContext
                 .IsUnicode(false);
         });
 
-        modelBuilder.Entity<TbTool>(entity =>
-        {
-            entity.ToTable("TbTool");
-
-            entity.Property(e => e.Barcode)
-                .HasMaxLength(15)
-                .IsUnicode(false);
-            entity.Property(e => e.Discount)
-                .HasDefaultValue(0m)
-                .HasColumnType("decimal(5, 2)");
-            entity.Property(e => e.IsActive).HasDefaultValue(true);
-            entity.Property(e => e.Name)
-                .HasMaxLength(100)
-                .IsUnicode(false);
-            entity.Property(e => e.Path)
-                .HasMaxLength(255)
-                .IsUnicode(false);
-            entity.Property(e => e.Price).HasColumnType("decimal(10, 2)");
-
-            entity.HasOne(d => d.BrandNavigation).WithMany(p => p.TbTools)
-                .HasForeignKey(d => d.Brand)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_TbTool_TbToolBrand");
-
-            entity.HasOne(d => d.CategoryNavigation).WithMany(p => p.TbTools)
-                .HasForeignKey(d => d.Category)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_TbTool_TbToolCategory");
-        });
-
-        modelBuilder.Entity<TbToolBrand>(entity =>
-        {
-            entity.ToTable("TbToolBrand");
-
-            entity.Property(e => e.Name)
-                .HasMaxLength(75)
-                .IsUnicode(false);
-        });
-
-        modelBuilder.Entity<TbToolCategory>(entity =>
-        {
-            entity.ToTable("TbToolCategory");
-
-            entity.Property(e => e.Name)
-                .HasMaxLength(75)
-                .IsUnicode(false);
-        });
-
         modelBuilder.Entity<TbUser>(entity =>
         {
             entity.ToTable("TbUser");
@@ -214,3 +328,5 @@ public partial class KikisDbContext : DbContext
     }
 
 }
+
+    

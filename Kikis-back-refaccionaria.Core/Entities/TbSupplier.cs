@@ -24,5 +24,7 @@
         public string? Representative { get; set; }
 
         public bool IsActive { get; set; }
+
+        public virtual ICollection<TbProductSupplier> TbProductSuppliers { get; set; } = new List<TbProductSupplier>();
     }
 }

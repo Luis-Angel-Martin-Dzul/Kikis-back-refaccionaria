@@ -8,10 +8,10 @@ namespace Kikis_back_refaccionaria.Infrastructure.Mapping {
         public AutomapperProfile() {
 
             //DTO
-            CreateMap<ToolREQ, TbTool>();
+            CreateMap<ProductREQ, TbProduct>();
 
             //Entity
-            CreateMap<TbTool, ToolREQ>();
+            CreateMap<TbProduct, ProductREQ>();
 
         }
 

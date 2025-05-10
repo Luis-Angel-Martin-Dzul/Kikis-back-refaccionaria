@@ -6,6 +6,8 @@ public partial class TbRol
 
     public string Name { get; set; } = null!;
 
+    public string? Description { get; set; }
+
     public virtual ICollection<TbPermission> TbPermissions { get; set; } = new List<TbPermission>();
 
     public virtual ICollection<TbUser> TbUsers { get; set; } = new List<TbUser>();

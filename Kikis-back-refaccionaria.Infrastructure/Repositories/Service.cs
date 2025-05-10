@@ -297,17 +297,24 @@ namespace Kikis_back_refaccionaria.Infrastructure.Repositories {
 
         #endregion
 
-        #region Tool
+        #region Product
         /*
          *  GET
          */
-        public async Task<IEnumerable<ToolRES>> GetTools(ToolFilter filter) {
+        public async Task<IEnumerable<ProductRES>> GetProducts(ProductFilter filter) {
 
             //query
-            var query = _unitOfWork.Tool
+            var query = _unitOfWork.Product
                 .GetQuery()
-                .Include(tool => tool.BrandNavigation)
-                .Include(tool => tool.CategoryNavigation)
+                .Include(product => product.BrandNavigation)
+                .Include(product => product.CategoryNavigation)
+                .Include(product => product.HallwayNavigation)
+                .Include(product => product.LevelNavigation)
+                .Include(product => product.ShelfNavigation)
+                .Include(product => product.TbProductSuppliers)
+                    .ThenInclude(product => product.SupplierNavigation)
+                .Include(product => product.TbProductKits)
+                    .ThenInclude(product => product.KitNavigation)
                 .Where(x => x.IsActive == true)
                 .AsNoTracking();
 
@@ -316,12 +323,32 @@ namespace Kikis_back_refaccionaria.Infrastructure.Repositories {
                 query = query.Where(x => x.Id == filter.Id);
 
             //select
-            var tools = await query.Select(x => new ToolRES {
+            var products = await query.Select(x => new ProductRES {
                 Id = x.Id,
                 Name = x.Name,
                 Barcode = x.Barcode,
                 Brand = x.BrandNavigation.Name,
                 Category = x.CategoryNavigation.Name,
+                Hallway = new GenericCatalog {
+                    Id = x.HallwayNavigation.Id,
+                    Name = x.HallwayNavigation.Name,
+                },
+                Level = new GenericCatalog {
+                    Id = x.LevelNavigation.Id,
+                    Name = x.LevelNavigation.Name,
+                },
+                Shelf = new GenericCatalog {
+                    Id = x.ShelfNavigation.Id,
+                    Name = x.ShelfNavigation.Name,
+                },
+                Suppliers = x.TbProductSuppliers.Select(x => new SupplierRES {
+                    Id = x.SupplierNavigation.Id,
+                    BusinessName = x.SupplierNavigation.BusinessName,
+                }).ToList(),
+                Kits = x.TbProductKits.Select(x => new GenericCatalog {
+                    Id = x.KitNavigation.Id,
+                    Name= x.KitNavigation.Name,
+                }).ToList(),
                 Quantity = x.Quantity,
                 Price = x.Price,
                 Discount = x.Discount,
@@ -329,24 +356,26 @@ namespace Kikis_back_refaccionaria.Infrastructure.Repositories {
                 IsActive = x.IsActive
             }).ToListAsync();
 
-            return tools;
+
+
+            return products;
         }
 
 
         /*
          *  DELETE
          */
-        public async Task<bool> DeleteTool(int id) {
+        public async Task<bool> DeleteProduct(int id) {
 
             try {
 
-                var tool = await _unitOfWork.Tool.GetById(id);
-                if(tool == null)
+                var Product = await _unitOfWork.Product.GetById(id);
+                if(Product == null)
                     throw new BusinessException("Producto no encontrado");
 
-                tool.IsActive = false;
+                Product.IsActive = false;
 
-                _unitOfWork.Tool.Update(tool);
+                _unitOfWork.Product.Update(Product);
                 await _unitOfWork.SaveChangeAsync();
 
                 return true;
@@ -362,19 +391,49 @@ namespace Kikis_back_refaccionaria.Infrastructure.Repositories {
         /*
          *  POST
          */
-        public async Task<ToolRES> PostTool(ToolREQ request) {
+        public async Task<ProductRES> PostProduct(ProductREQ request) {
 
             try {
 
-                var tool = _mapper.Map<TbTool>(request);
+                var product = _mapper.Map<TbProduct>(request);
 
-                _unitOfWork.Tool.Add(tool);
+                //product
+                _unitOfWork.Product.Add(product);
                 await _unitOfWork.SaveChangeAsync();
 
-                var lastInsert = await GetTools(new ToolFilter { Id = tool.Id });
-                var toolRES = lastInsert.FirstOrDefault();
+                var lastInsert = await GetProducts(new ProductFilter { Id = product.Id });
+                var productRES = lastInsert.FirstOrDefault();
 
-                return toolRES;
+
+                //supplier
+                var suppliers = request.Suppliers.Select(x => new TbProductSupplier {
+                    Product = product.Id,
+                    Supplier = x.Id
+                });
+                _unitOfWork.ProductSupplier.AddRange(suppliers);
+                await _unitOfWork.SaveChangeAsync();
+
+
+                //kits
+                var kits = request.Kits.Select(x => new TbProductKit {
+                    Product = product.Id,
+                    Kit = x.Id
+                });
+                _unitOfWork.ProductKit.AddRange(kits);
+                await _unitOfWork.SaveChangeAsync();
+
+
+                //mapper supplier
+                productRES.Suppliers = request.Suppliers.Select(x => new SupplierRES {
+                    Id = x.Id,
+                    BusinessName = x.BusinessName
+                }).ToList();
+                productRES.Kits = request.Kits.Select(x => new GenericCatalog {
+                    Id = x.Id,
+                    Name = x.Name
+                }).ToList();
+
+                return productRES;
             }
             catch(Exception ex) {
 
@@ -386,17 +445,17 @@ namespace Kikis_back_refaccionaria.Infrastructure.Repositories {
         /*
          *  PUT
          */
-        public async Task<bool> PutToolPromotion(ToolPromotionREQ request) {
+        public async Task<bool> PutProductPromotion(ProductPromotionREQ request) {
 
             try {
 
-                var tool = await _unitOfWork.Tool.GetById(request.Id);
-                if(tool == null)
+                var Product = await _unitOfWork.Product.GetById(request.Id);
+                if(Product == null)
                     throw new BusinessException("Producto no encontrado");
 
-                tool.Discount = request.Discount;
+                Product.Discount = request.Discount;
 
-                _unitOfWork.Tool.Update(tool);
+                _unitOfWork.Product.Update(Product);
                 await _unitOfWork.SaveChangeAsync();
 
                 return true;
@@ -407,17 +466,17 @@ namespace Kikis_back_refaccionaria.Infrastructure.Repositories {
                 throw new BusinessException($"Error al actualizar promocion: {ex.Message}");
             }
         }
-        public async Task<bool> PutToolStock(ToolStockREQ request) {
+        public async Task<bool> PutProductStock(ProductStockREQ request) {
 
             try {
 
-                var tool = await _unitOfWork.Tool.GetById(request.Id);
-                if(tool == null)
+                var Product = await _unitOfWork.Product.GetById(request.Id);
+                if(Product == null)
                     throw new BusinessException("Producto no encontrado");
 
-                tool.Quantity += request.StockToAdd;
+                Product.Quantity += request.StockToAdd;
 
-                _unitOfWork.Tool.Update(tool);
+                _unitOfWork.Product.Update(Product);
                 await _unitOfWork.SaveChangeAsync();
 
                 return true;
@@ -426,6 +485,117 @@ namespace Kikis_back_refaccionaria.Infrastructure.Repositories {
             catch(Exception ex) {
 
                 throw new BusinessException($"Error al actualizar el stock: {ex.Message}");
+            }
+        }
+        public async Task<bool> PutProductWarehouse(ProductWarehouseREQ request) {
+
+            try {
+
+                var product = await _unitOfWork.Product.GetById(request.Id);
+                if(product == null)
+                    throw new BusinessException("Producto no encontrado");
+
+                product.Hallway = request.Hallway.Id;
+                product.Level = request.Level.Id;
+                product.Shelf = request.Shelf.Id;
+
+                _unitOfWork.Product.Update(product);
+                await _unitOfWork.SaveChangeAsync();
+
+                return true;
+
+            }
+            catch(Exception ex) {
+
+                throw new BusinessException($"Error al actualizar la ubicacion del almacen: {ex.Message}");
+            }
+        }
+        public async Task<bool> PutProductSupplier(ProductRES request) {
+
+            try {
+                await _unitOfWork.BeginTransactionAsync();
+
+                var supplierSave = await _unitOfWork.ProductSupplier
+                    .GetQuery()
+                    .Where(x => x.Product == request.Id)
+                    .ToListAsync();
+
+                var supplierMap = request.Suppliers.Select(x => new TbProductSupplier {
+                    Id = 0,
+                    Product = request.Id,
+                    Supplier = x.Id,
+                }).ToList();
+
+                //Deletes
+                var removed = supplierSave.Where(x => !supplierMap.Any(s => s.Supplier == x.Supplier))
+                    .ToList();
+                if(removed.Any()) {
+
+                    _unitOfWork.ProductSupplier.DeleteRange(removed);
+                    await _unitOfWork.SaveChangeAsync();
+                }
+
+                //Adds
+                var news = supplierMap.Where(x => !supplierSave.Any(s => s.Supplier == x.Supplier))
+                    .ToList();
+                if(news.Any()) {
+
+                    _unitOfWork.ProductSupplier.AddRange(news);
+                    await _unitOfWork.SaveChangeAsync();
+                }
+
+                await _unitOfWork.CommitTransactionAsync();
+
+                return true;
+
+            }
+            catch(Exception ex) {
+
+                throw new BusinessException($"Error al actualizar la proveedor: {ex.Message}");
+            }
+        }
+        public async Task<bool> PutProductKit(ProductRES request) {
+            try {
+
+                await _unitOfWork.BeginTransactionAsync();
+
+                var kitSave = await _unitOfWork.ProductKit
+                    .GetQuery()
+                    .Where(x => x.Product == request.Id)
+                    .ToListAsync();
+
+                var kitMap = request.Kits.Select(x => new TbProductKit {
+                    Id = 0,
+                    Product = request.Id,
+                    Kit = x.Id,
+                }).ToList();
+
+                //Deletes
+                var removed = kitSave.Where(x => !kitMap.Any(s => s.Kit == x.Kit))
+                    .ToList();
+                if(removed.Any()) {
+
+                    _unitOfWork.ProductKit.DeleteRange(removed);
+                    await _unitOfWork.SaveChangeAsync();
+                }
+
+                //Adds
+                var news = kitMap.Where(x => !kitSave.Any(s => s.Kit == x.Kit))
+                    .ToList();
+                if(news.Any()) {
+
+                    _unitOfWork.ProductKit.AddRange(news);
+                    await _unitOfWork.SaveChangeAsync();
+                }
+
+                await _unitOfWork.CommitTransactionAsync();
+
+                return true;
+
+            }
+            catch(Exception ex) {
+
+                throw new BusinessException($"Error al actualizar el kit (grupo): {ex.Message}");
             }
         }
 
@@ -439,8 +609,8 @@ namespace Kikis_back_refaccionaria.Infrastructure.Repositories {
         /*
          *  GET
          */
-        public async Task<IEnumerable<GenericCatalog>> GetToolCategory() {
-            var data = await _unitOfWork.ToolCategory.GetAll();
+        public async Task<IEnumerable<GenericCatalog>> GetProductCategory() {
+            var data = await _unitOfWork.ProductCategory.GetAll();
 
             var response = data.Select(x => new GenericCatalog{
                 Id = x.Id,
@@ -449,8 +619,9 @@ namespace Kikis_back_refaccionaria.Infrastructure.Repositories {
 
             return response;
         }
-        public async Task<IEnumerable<GenericCatalog>> GetToolBrand() {
-            var data = await _unitOfWork.ToolBrand.GetAll();
+        
+        public async Task<IEnumerable<GenericCatalog>> GetProductBrand() {
+            var data = await _unitOfWork.ProductBrand.GetAll();
 
             var response = data.Select(x => new GenericCatalog {
                 Id = x.Id,
@@ -459,6 +630,55 @@ namespace Kikis_back_refaccionaria.Infrastructure.Repositories {
 
             return response;
         }
+
+        public async Task<IEnumerable<GenericCatalog>> GetProductHallway(){
+
+            var data = await _unitOfWork.ProductHallway.GetAll();
+
+            var response = data.Select(x => new GenericCatalog {
+                Id = x.Id,
+                Name = x.Name
+            }).ToList();
+
+            return response;
+        }
+
+        public async Task<IEnumerable<GenericCatalog>> GetProductLevel(){
+
+            var data = await _unitOfWork.ProductLevel.GetAll();
+
+            var response = data.Select(x => new GenericCatalog {
+                Id = x.Id,
+                Name = x.Name
+            }).ToList();
+
+            return response;
+        }
+
+        public async Task<IEnumerable<GenericCatalog>> GetProductShelf() {
+
+            var data = await _unitOfWork.ProductShelf.GetAll();
+
+            var response = data.Select(x => new GenericCatalog {
+                Id = x.Id,
+                Name = x.Name
+            }).ToList();
+
+            return response;
+        }
+
+        public async Task<IEnumerable<GenericCatalog>> GetProductKit() {
+
+            var data = await _unitOfWork.Kit.GetAll();
+
+            var response = data.Select(x => new GenericCatalog {
+                Id = x.Id,
+                Name = x.Name
+            }).ToList();
+
+            return response;
+        }
+       
 
         /*
          *  POST
@@ -500,7 +720,7 @@ namespace Kikis_back_refaccionaria.Infrastructure.Repositories {
                 CreateDate = sale.CreateDate,
                 SaleDetails = sale.TbSaleDetails.Select(sale => new SaleDetail {
                     Id = sale.Id,
-                    Tool = sale.Tool,
+                    Product = sale.Product,
                     Price = sale.Price,
                     PriceUnit = sale.PriceUnit,
                     Quantity = sale.Quantity,
@@ -535,7 +755,7 @@ namespace Kikis_back_refaccionaria.Infrastructure.Repositories {
 
                 var saleDatails = request.SaleDetails.Select(x => new TbSaleDetail {
                     Sale = sale.Id,
-                    Tool = x.Tool,
+                    Product = x.Product,
                     Price = x.Price,
                     PriceUnit = x.PriceUnit,
                     Quantity = x.Quantity,
@@ -544,23 +764,23 @@ namespace Kikis_back_refaccionaria.Infrastructure.Repositories {
                 _unitOfWork.SaleDetail.AddRange(saleDatails);
                 await _unitOfWork.SaveChangeAsync();
 
-                //update tool
-                var toolSends = saleDatails
-                    .GroupBy(s => s.Tool)
+                //update Product
+                var ProductSends = saleDatails
+                    .GroupBy(s => s.Product)
                     .ToDictionary(g => g.Key, g => g.Sum(s => s.Quantity));
-                var toolIds = toolSends.Keys.ToList();
+                var ProductIds = ProductSends.Keys.ToList();
 
-                var tools = await _unitOfWork.Tool
+                var Products = await _unitOfWork.Product
                     .GetQuery()
-                    .Where(x => toolIds.Contains(x.Id))
+                    .Where(x => ProductIds.Contains(x.Id))
                     .ToListAsync();
 
-                foreach(var t in tools) {
-                    if(toolSends.TryGetValue(t.Id, out var quantitySend)) {
+                foreach(var t in Products) {
+                    if(ProductSends.TryGetValue(t.Id, out var quantitySend)) {
                         t.Quantity -= quantitySend;
                     }
                 }
-                _unitOfWork.Tool.UpdateRange(tools);
+                _unitOfWork.Product.UpdateRange(Products);
                 await _unitOfWork.SaveChangeAsync();
 
 

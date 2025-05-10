@@ -37,31 +37,34 @@ namespace Kikis_back_refaccionaria.Core.Interfaces {
 
         #endregion
 
-        #region Tool
+        #region Product
 
         /*
          *  GET
          */
-        Task<IEnumerable<ToolRES>> GetTools(ToolFilter filter);
+        Task<IEnumerable<ProductRES>> GetProducts(ProductFilter filter);
 
 
         /*
          *  DELETE
          */
-        Task<bool> DeleteTool(int id);
+        Task<bool> DeleteProduct(int id);
 
 
         /*
          *  POST
          */
-        Task<ToolRES> PostTool(ToolREQ request);
+        Task<ProductRES> PostProduct(ProductREQ request);
 
 
         /*
          *  PUT
          */
-        Task<bool> PutToolPromotion(ToolPromotionREQ request);
-        Task<bool> PutToolStock(ToolStockREQ request);
+        Task<bool> PutProductPromotion(ProductPromotionREQ request);
+        Task<bool> PutProductStock(ProductStockREQ request);
+        Task<bool> PutProductWarehouse(ProductWarehouseREQ request);
+        Task<bool> PutProductSupplier(ProductRES request);
+        Task<bool> PutProductKit(ProductRES request);
 
         #endregion
 
@@ -69,8 +72,12 @@ namespace Kikis_back_refaccionaria.Core.Interfaces {
         /*
          *  GET
          */
-        Task<IEnumerable<GenericCatalog>> GetToolCategory();
-        Task<IEnumerable<GenericCatalog>> GetToolBrand();
+        Task<IEnumerable<GenericCatalog>> GetProductCategory();
+        Task<IEnumerable<GenericCatalog>> GetProductBrand();
+        Task<IEnumerable<GenericCatalog>> GetProductHallway();
+        Task<IEnumerable<GenericCatalog>> GetProductLevel();
+        Task<IEnumerable<GenericCatalog>> GetProductShelf();
+        Task<IEnumerable<GenericCatalog>> GetProductKit();
 
         /*
          *  POST

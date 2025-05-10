@@ -6,7 +6,7 @@
 
         public int Sale { get; set; }
 
-        public int Tool { get; set; }
+        public int Product { get; set; }
 
         public decimal Price { get; set; }
 

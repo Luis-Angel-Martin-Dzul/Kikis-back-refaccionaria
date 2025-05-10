@@ -39,6 +39,10 @@ namespace Kikis_back_refaccionaria.Infrastructure.Repositories {
             _dbSet.Remove(entity);
         }
 
+        public void DeleteRange(IEnumerable<T> entities) {
+            _dbSet.RemoveRange(entities);
+        }
+
         public IQueryable<T> GetQuery() {
             return _dbSet.AsQueryable();
         }

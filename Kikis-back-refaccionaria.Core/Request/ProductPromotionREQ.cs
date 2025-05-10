@@ -1,5 +1,5 @@
 ﻿namespace Kikis_back_refaccionaria.Core.Request {
-    public class ToolPromotionREQ {
+    public class ProductPromotionREQ {
 
         public int Id { get; set; }
 
