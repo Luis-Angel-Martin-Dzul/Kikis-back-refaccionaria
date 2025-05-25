@@ -1,4 +1,5 @@
 using Kikis_back_refaccionaria.Core.Interfaces;
+using Kikis_back_refaccionaria.Core.Settings;
 using Kikis_back_refaccionaria.Infrastructure.Data;
 using Kikis_back_refaccionaria.Infrastructure.Filters;
 using Kikis_back_refaccionaria.Infrastructure.Repositories;
@@ -27,6 +28,10 @@ builder.Services.AddDbContext<KikisDbContext>(opt =>
     opt.UseSqlServer(builder.Configuration.GetConnectionString("DbContext")));
 
 // Services
+builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
+builder.Services.AddTransient<IServiceEMail, ServiceEMail>();
+
+
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddTransient<IService, Service>();

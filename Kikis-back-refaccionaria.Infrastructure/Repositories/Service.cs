@@ -7,15 +7,18 @@ using Kikis_back_refaccionaria.Core.Request;
 using Kikis_back_refaccionaria.Core.Responses;
 using Kikis_back_refaccionaria.Infrastructure.Encryption;
 using Microsoft.EntityFrameworkCore;
+using System.Linq;
 
 namespace Kikis_back_refaccionaria.Infrastructure.Repositories {
     public class Service : IService {
 
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
-        public Service(IUnitOfWork unitOfWork, IMapper mapper) {
+        private readonly IServiceEMail _emailService;
+        public Service(IUnitOfWork unitOfWork, IMapper mapper, IServiceEMail emailService) {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
+            _emailService = emailService;
         }
 
         #region User
@@ -122,7 +125,7 @@ namespace Kikis_back_refaccionaria.Infrastructure.Repositories {
 
             try {
                 string password = Utilities.Util.Generator(8);
-                password = Hashing.EncodeSHA256(password);
+                string passwordEncode = Hashing.EncodeSHA256(password);
 
                 var user = new TbUser {
                     Id = request.Id,
@@ -132,12 +135,14 @@ namespace Kikis_back_refaccionaria.Infrastructure.Repositories {
                     Curp = request.Curp,
                     Rol = request.Rol.Id,
                     CreateDate = request.CreateDate,
-                    Password = password,
+                    Password = passwordEncode,
                     IsActive = true,
                 };
 
                 _unitOfWork.User.Add(user);
                 await _unitOfWork.SaveChangeAsync();
+
+                _emailService.SendUserPasswordEmail(user.Email, password);
 
                 var lastInsert = await GetUsers(new UserFilter { Id = user.Id });
                 var response = lastInsert.FirstOrDefault();
@@ -701,6 +706,9 @@ namespace Kikis_back_refaccionaria.Infrastructure.Repositories {
                 .Include(sale => sale.SellerNavigation)
                 .Include(sale => sale.TbSaleDetails)
                 .AsNoTracking();
+            var products = _unitOfWork.Product
+                .GetQuery()
+                .AsNoTracking();
 
             //filter
             if(filter.Id != null)
@@ -721,6 +729,7 @@ namespace Kikis_back_refaccionaria.Infrastructure.Repositories {
                 SaleDetails = sale.TbSaleDetails.Select(sale => new SaleDetail {
                     Id = sale.Id,
                     Product = sale.Product,
+                    Name = products.FirstOrDefault(x => x.Id == sale.Product).Name,
                     Price = sale.Price,
                     PriceUnit = sale.PriceUnit,
                     Quantity = sale.Quantity,

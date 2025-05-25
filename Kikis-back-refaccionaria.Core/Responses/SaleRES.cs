@@ -25,6 +25,8 @@
 
         public int Product { get; set; }
 
+        public string Name { get; set; }
+
         public decimal Price { get; set; }
 
         public decimal PriceUnit { get; set; }
