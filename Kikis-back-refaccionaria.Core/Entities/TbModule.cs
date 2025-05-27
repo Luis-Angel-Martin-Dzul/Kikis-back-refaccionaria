@@ -1,12 +1,24 @@
-﻿namespace Kikis_back_refaccionaria.Core.Entities;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
-public partial class TbModule
-{
-    public int Id { get; set; }
+namespace Kikis_back_refaccionaria.Core.Entities {
 
-    public string Name { get; set; } = null!;
+    [Table("tbmodule")]
+    public partial class tbmodule {
+        [Key]
+        public int Id {
+            get; set;
+        }
 
-    public string? Description { get; set; }
+        [StringLength(75)]
+        public string Name { get; set; } = null!;
 
-    public virtual ICollection<TbPermission> TbPermissions { get; set; } = new List<TbPermission>();
+        [StringLength(255)]
+        public string? Description {
+            get; set;
+        }
+
+        [InverseProperty("ModuleNavigation")]
+        public virtual ICollection<TbPermission> TbPermissions { get; set; } = new List<TbPermission>();
+    }
 }

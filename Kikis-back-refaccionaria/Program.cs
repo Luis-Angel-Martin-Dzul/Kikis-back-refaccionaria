@@ -24,8 +24,10 @@ builder.Services.Configure<ApiBehaviorOptions>(options => {
 });
 
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
-builder.Services.AddDbContext<KikisDbContext>(opt =>
-    opt.UseSqlServer(builder.Configuration.GetConnectionString("DbContext")));
+var connectionString = builder.Configuration.GetConnectionString("DbContext");
+builder.Services.AddDbContext<KikisDbContext>(options =>
+    options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
+
 
 // Services
 builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));

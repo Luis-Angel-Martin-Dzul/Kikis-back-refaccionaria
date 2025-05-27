@@ -7,7 +7,6 @@ using Kikis_back_refaccionaria.Core.Request;
 using Kikis_back_refaccionaria.Core.Responses;
 using Kikis_back_refaccionaria.Infrastructure.Encryption;
 using Microsoft.EntityFrameworkCore;
-using System.Linq;
 
 namespace Kikis_back_refaccionaria.Infrastructure.Repositories {
     public class Service : IService {
@@ -722,7 +721,7 @@ namespace Kikis_back_refaccionaria.Infrastructure.Repositories {
                     Name = $"{sale.SellerNavigation.FirstName} {sale.SellerNavigation.LastName}"
                 },
                 SubTotal = sale.SubTotal,
-                Iva = sale.Iva,
+                Iva = sale.IVA,
                 Total = sale.Total,
                 Pay = sale.Pay,
                 CreateDate = sale.CreateDate,
@@ -754,7 +753,7 @@ namespace Kikis_back_refaccionaria.Infrastructure.Repositories {
                 var sale = new TbSale {
                     Seller = request.Seller.Id,
                     SubTotal = request.SubTotal,
-                    Iva = request.Iva,
+                    IVA = request.Iva,
                     Total = request.Total,
                     Pay = request.Pay,
                     CreateDate = request.CreateDate,
@@ -822,8 +821,8 @@ namespace Kikis_back_refaccionaria.Infrastructure.Repositories {
                 Id = x.Id,
                 BusinessName = x.BusinessName,
                 TradeName = x.TradeName,
-                Rfc = x.Rfc,
-                Curp = x.Curp,
+                Rfc = x.RFC,
+                Curp = x.CURP,
                 Email = x.Email,
                 Cellphone = x.Cellphone,
                 Cellphone2 = x.Cellphone2,
@@ -874,8 +873,8 @@ namespace Kikis_back_refaccionaria.Infrastructure.Repositories {
                     Id = request.Id,
                     BusinessName = request.BusinessName,
                     TradeName = request.TradeName,
-                    Rfc = request.Rfc,
-                    Curp = request.Curp,
+                    RFC = request.Rfc,
+                    CURP = request.Curp,
                     Email = request.Email,
                     Cellphone = request.Cellphone,
                     Cellphone2 = request.Cellphone2,
@@ -938,8 +937,8 @@ namespace Kikis_back_refaccionaria.Infrastructure.Repositories {
                     Id = supplier.Id,
                     BusinessName = request.BusinessName,
                     TradeName = supplier.TradeName,
-                    Rfc = supplier.Rfc,
-                    Curp = supplier.Curp,
+                    Rfc = supplier.RFC,
+                    Curp = supplier.CURP,
                     Email = request.Email,
                     Cellphone = request.Cellphone,
                     Cellphone2 = request.Cellphone2,
@@ -974,3 +973,4 @@ namespace Kikis_back_refaccionaria.Infrastructure.Repositories {
         #endregion
     }
 }
+//dotnet ef dbcontext scaffold "server=127.0.0.1;port=3306;user=root;password=password;database=kikis_ferreteria" Pomelo.EntityFrameworkCore.MySql -o Models --context TuDbContext --context-dir Context --use-database-names --no-onconfiguring --data-annotations

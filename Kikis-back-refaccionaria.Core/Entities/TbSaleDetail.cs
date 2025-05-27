@@ -1,21 +1,51 @@
-﻿namespace Kikis_back_refaccionaria.Core.Entities {
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.EntityFrameworkCore;
 
-    public partial class TbSaleDetail
-    {
-        public int Id { get; set; }
+namespace Kikis_back_refaccionaria.Core.Entities {
 
-        public int Sale { get; set; }
+    [Table("tbsaledetail")]
+    [Index("Product", Name = "Product")]
+    [Index("Sale", Name = "Sale")]
+    public partial class TbSaleDetail {
+        [Key]
+        public int Id {
+            get; set;
+        }
 
-        public int Product { get; set; }
+        public int Sale {
+            get; set;
+        }
 
-        public decimal Price { get; set; }
+        public int Product {
+            get; set;
+        }
 
-        public decimal PriceUnit { get; set; }
+        [Precision(10, 2)]
+        public decimal Price {
+            get; set;
+        }
 
-        public int Quantity { get; set; }
+        [Precision(10, 2)]
+        public decimal PriceUnit {
+            get; set;
+        }
 
-        public decimal Total { get; set; }
+        public int Quantity {
+            get; set;
+        }
 
+        [Precision(10, 2)]
+        public decimal Total {
+            get; set;
+        }
+
+        [ForeignKey("Product")]
+        [InverseProperty("TbSaleDetails")]
+        public virtual TbProduct ProductNavigation { get; set; } = null!;
+
+        [ForeignKey("Sale")]
+        [InverseProperty("TbSaleDetails")]
         public virtual TbSale SaleNavigation { get; set; } = null!;
     }
 }

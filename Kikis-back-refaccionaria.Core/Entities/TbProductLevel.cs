@@ -1,12 +1,24 @@
-﻿namespace Kikis_back_refaccionaria.Core.Entities {
-    public class TbProductLevel {
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
-        public int Id { get; set; }
+namespace Kikis_back_refaccionaria.Core.Entities {
 
+    [Table("tbproductlevel")]
+    public partial class TbProductLevel {
+        [Key]
+        public int Id {
+            get; set;
+        }
+
+        [StringLength(75)]
         public string Name { get; set; } = null!;
 
-        public string? Description { get; set; }
+        [StringLength(255)]
+        public string? Description {
+            get; set;
+        }
 
+        [InverseProperty("LevelNavigation")]
         public virtual ICollection<TbProduct> TbProducts { get; set; } = new List<TbProduct>();
     }
 }

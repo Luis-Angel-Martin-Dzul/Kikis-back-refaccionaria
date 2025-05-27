@@ -1,22 +1,48 @@
-﻿namespace Kikis_back_refaccionaria.Core.Entities;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.EntityFrameworkCore;
 
-public partial class TbPermission
-{
-    public int Id { get; set; }
+namespace Kikis_back_refaccionaria.Core.Entities {
 
-    public int Rol { get; set; }
+    [Table("tbpermission")]
+    [Index("Module", Name = "Module")]
+    [Index("Rol", Name = "Rol")]
+    public partial class TbPermission {
+        [Key]
+        public int Id {
+            get; set;
+        }
 
-    public int Module { get; set; }
+        public int Rol {
+            get; set;
+        }
 
-    public bool CanAdd { get; set; }
+        public int Module {
+            get; set;
+        }
 
-    public bool CanEdit { get; set; }
+        public bool CanAdd {
+            get; set;
+        }
 
-    public bool CanDelete { get; set; }
+        public bool CanEdit {
+            get; set;
+        }
 
-    public bool CanView { get; set; }
+        public bool CanDelete {
+            get; set;
+        }
 
-    public virtual TbModule ModuleNavigation { get; set; } = null!;
+        public bool CanView {
+            get; set;
+        }
 
-    public virtual TbRol RolNavigation { get; set; } = null!;
+        [ForeignKey("Module")]
+        [InverseProperty("TbPermissions")]
+        public virtual tbmodule ModuleNavigation { get; set; } = null!;
+
+        [ForeignKey("Rol")]
+        [InverseProperty("TbPermissions")]
+        public virtual TbRol RolNavigation { get; set; } = null!;
+    }
 }
