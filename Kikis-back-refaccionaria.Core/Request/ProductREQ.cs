@@ -31,5 +31,8 @@ namespace Kikis_back_refaccionaria.Core.Request {
 
         public List<SupplierRES> Suppliers { get; set; }
         public List<GenericCatalog> Kits { get; set; }
+
+        public string? imgB64 { get; set; }
+        public string? imgName { get; set; }
     }
 }

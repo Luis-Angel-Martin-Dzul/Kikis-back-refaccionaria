@@ -19,4 +19,8 @@
     <ProjectReference Include="..\Kikis-back-refaccionaria.Infrastructure\Kikis-back-refaccionaria.Infrastructure.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="wwwroot\img\prod\" />
+  </ItemGroup>
+
 </Project>

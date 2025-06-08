@@ -52,6 +52,7 @@ TestResults/
 
 # Archivos de publish
 publish/
+wwwroot/
 
 # Archivos de cobertura
 coverage/

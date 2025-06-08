@@ -6,6 +6,7 @@ using Kikis_back_refaccionaria.Core.Interfaces;
 using Kikis_back_refaccionaria.Core.Request;
 using Kikis_back_refaccionaria.Core.Responses;
 using Kikis_back_refaccionaria.Infrastructure.Encryption;
+using Kikis_back_refaccionaria.Infrastructure.Utilities;
 using Microsoft.EntityFrameworkCore;
 
 namespace Kikis_back_refaccionaria.Infrastructure.Repositories {
@@ -356,7 +357,7 @@ namespace Kikis_back_refaccionaria.Infrastructure.Repositories {
                 Quantity = x.Quantity,
                 Price = x.Price,
                 Discount = x.Discount,
-                Path = x.Path,
+                Path = Constants.HOST + x.Path,
                 IsActive = x.IsActive
             }).ToListAsync();
 
@@ -402,6 +403,7 @@ namespace Kikis_back_refaccionaria.Infrastructure.Repositories {
                 var product = _mapper.Map<TbProduct>(request);
 
                 //product
+                product.Path = Util.SaveBase64File(request, Constants.PATH_IMG_PRODUCT);
                 _unitOfWork.Product.Add(product);
                 await _unitOfWork.SaveChangeAsync();
 
@@ -682,7 +684,7 @@ namespace Kikis_back_refaccionaria.Infrastructure.Repositories {
 
             return response;
         }
-       
+
 
         /*
          *  POST
@@ -704,6 +706,7 @@ namespace Kikis_back_refaccionaria.Infrastructure.Repositories {
                 .GetQuery()
                 .Include(sale => sale.SellerNavigation)
                 .Include(sale => sale.TbSaleDetails)
+                    .ThenInclude(sale => sale.ProductNavigation)
                 .AsNoTracking();
             var products = _unitOfWork.Product
                 .GetQuery()
@@ -728,7 +731,7 @@ namespace Kikis_back_refaccionaria.Infrastructure.Repositories {
                 SaleDetails = sale.TbSaleDetails.Select(sale => new SaleDetail {
                     Id = sale.Id,
                     Product = sale.Product,
-                    Name = products.FirstOrDefault(x => x.Id == sale.Product).Name,
+                    Name = sale.ProductNavigation.Name,
                     Price = sale.Price,
                     PriceUnit = sale.PriceUnit,
                     Quantity = sale.Quantity,
