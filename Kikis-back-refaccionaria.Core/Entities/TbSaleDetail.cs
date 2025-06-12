@@ -9,36 +9,22 @@ namespace Kikis_back_refaccionaria.Core.Entities {
     [Index("Sale", Name = "Sale")]
     public partial class TbSaleDetail {
         [Key]
-        public int Id {
-            get; set;
-        }
+        public int Id { get; set; }
 
-        public int Sale {
-            get; set;
-        }
+        public int Sale { get; set; }
 
-        public int Product {
-            get; set;
-        }
+        public int Product { get; set; }
 
         [Precision(10, 2)]
-        public decimal Price {
-            get; set;
-        }
+        public decimal Price { get; set; }
 
         [Precision(10, 2)]
-        public decimal PriceUnit {
-            get; set;
-        }
+        public decimal PriceUnit { get; set; }
 
-        public int Quantity {
-            get; set;
-        }
+        public int Quantity { get; set; }
 
         [Precision(10, 2)]
-        public decimal Total {
-            get; set;
-        }
+        public decimal Total { get; set; }
 
         [ForeignKey("Product")]
         [InverseProperty("TbSaleDetails")]

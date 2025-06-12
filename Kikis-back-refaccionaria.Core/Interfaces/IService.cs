@@ -83,9 +83,14 @@ namespace Kikis_back_refaccionaria.Core.Interfaces {
          *  POST
          */
 
+        Task<GenericCatalog> PostProductBrand(GenericCatalogREQ request);
+
         /*
          *  PUT
          */
+        Task<GenericCatalog> PutProductBrand(GenericCatalogREQ request);
+
+
         #endregion
 
         #region Sale

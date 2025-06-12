@@ -7,6 +7,14 @@ namespace Kikis_back_refaccionaria.Infrastructure.Data {
 
         public KikisDbContext(DbContextOptions<KikisDbContext> options) : base(options) {}
 
+        public virtual DbSet<TbDelivery> TbDeliveries { get; set; }
+
+        public virtual DbSet<TbDeliveryDetail> TbDeliveryDetails { get; set; }
+
+        public virtual DbSet<TbDeliveryDetailsStatus> TbDeliveryDetailsStatuses { get; set; }
+
+        public virtual DbSet<TbDeliveryStatus> TbDeliveryStatuses { get; set; }
+
         public virtual DbSet<TbKit> TbKits { get; set; }
 
         public virtual DbSet<tbmodule> tbmodules { get; set; }
@@ -43,6 +51,46 @@ namespace Kikis_back_refaccionaria.Infrastructure.Data {
             modelBuilder
                 .UseCollation("utf8mb4_0900_ai_ci")
                 .HasCharSet("utf8mb4");
+
+            modelBuilder.Entity<TbDelivery>(entity =>
+            {
+                entity.HasKey(e => e.Id).HasName("PRIMARY");
+
+                entity.HasOne(d => d.StatusNavigation).WithMany(p => p.TbDeliveries)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("tbdelivery_ibfk_2");
+
+                entity.HasOne(d => d.UserNavigation).WithMany(p => p.TbDeliveries)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("tbdelivery_ibfk_1");
+            });
+
+            modelBuilder.Entity<TbDeliveryDetail>(entity =>
+            {
+                entity.HasKey(e => e.Id).HasName("PRIMARY");
+
+                entity.HasOne(d => d.DeliveryNavigation).WithMany(p => p.TbDeliveryDetails)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("tbdeliverydetails_ibfk_1");
+
+                entity.HasOne(d => d.SaleNavigation).WithMany(p => p.TbDeliveryDetails)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("tbdeliverydetails_ibfk_2");
+
+                entity.HasOne(d => d.StatusNavigation).WithMany(p => p.TbDeliveryDetails)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("tbdeliverydetails_ibfk_3");
+            });
+
+            modelBuilder.Entity<TbDeliveryDetailsStatus>(entity =>
+            {
+                entity.HasKey(e => e.Id).HasName("PRIMARY");
+            });
+
+            modelBuilder.Entity<TbDeliveryStatus>(entity =>
+            {
+                entity.HasKey(e => e.Id).HasName("PRIMARY");
+            });
 
             modelBuilder.Entity<TbKit>(entity =>
             {

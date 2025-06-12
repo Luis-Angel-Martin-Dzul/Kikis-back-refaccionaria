@@ -9,17 +9,11 @@ namespace Kikis_back_refaccionaria.Core.Entities {
     [Index("Supplier", Name = "Supplier")]
     public partial class TbProductSupplier {
         [Key]
-        public int Id {
-            get; set;
-        }
+        public int Id { get; set; }
 
-        public int Product {
-            get; set;
-        }
+        public int Product { get; set; }
 
-        public int Supplier {
-            get; set;
-        }
+        public int Supplier { get; set; }
 
         [ForeignKey("Product")]
         [InverseProperty("TbProductSuppliers")]

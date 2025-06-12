@@ -6,9 +6,7 @@ namespace Kikis_back_refaccionaria.Core.Entities {
     [Table("tbsupplier")]
     public partial class TbSupplier {
         [Key]
-        public int Id {
-            get; set;
-        }
+        public int Id { get; set; }
 
         [StringLength(100)]
         public string BusinessName { get; set; } = null!;
@@ -29,9 +27,7 @@ namespace Kikis_back_refaccionaria.Core.Entities {
         public string Cellphone { get; set; } = null!;
 
         [StringLength(20)]
-        public string? Cellphone2 {
-            get; set;
-        }
+        public string? Cellphone2 { get; set; }
 
         [StringLength(200)]
         public string Address { get; set; } = null!;
@@ -40,13 +36,9 @@ namespace Kikis_back_refaccionaria.Core.Entities {
         public string Owner { get; set; } = null!;
 
         [StringLength(150)]
-        public string? Representative {
-            get; set;
-        }
+        public string? Representative { get; set; }
 
-        public bool IsActive {
-            get; set;
-        }
+        public bool IsActive { get; set; }
 
         [InverseProperty("SupplierNavigation")]
         public virtual ICollection<TbProductSupplier> TbProductSuppliers { get; set; } = new List<TbProductSupplier>();

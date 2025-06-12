@@ -620,7 +620,8 @@ namespace Kikis_back_refaccionaria.Infrastructure.Repositories {
 
             var response = data.Select(x => new GenericCatalog{
                 Id = x.Id,
-                Name = x.Name
+                Name = x.Name,
+                Description = x.Description
             }).ToList();
 
             return response;
@@ -631,7 +632,8 @@ namespace Kikis_back_refaccionaria.Infrastructure.Repositories {
 
             var response = data.Select(x => new GenericCatalog {
                 Id = x.Id,
-                Name = x.Name
+                Name = x.Name,
+                Description = x.Description
             }).ToList();
 
             return response;
@@ -690,9 +692,67 @@ namespace Kikis_back_refaccionaria.Infrastructure.Repositories {
          *  POST
          */
 
+        public async Task<GenericCatalog> PostProductBrand(GenericCatalogREQ request) {
+
+
+            try {
+
+                var brand = new TbProductBrand {
+                    Name = request.Name,
+                    Description = request.Description
+                };
+
+                _unitOfWork.ProductBrand.Add(brand);
+                await _unitOfWork.SaveChangeAsync();
+
+                var response = new GenericCatalog() {
+                    Id = brand.Id,
+                    Name = brand.Name,
+                    Description = brand.Description
+                };
+
+                return response;
+            }
+            catch(Exception ex) {
+
+                throw new BusinessException($"Ocurrió un error inesperado al intentar agregar marca\n{ex.Message}");
+            }
+        }
+
+
+
         /*
          *  PUT
          */
+        public async Task<GenericCatalog> PutProductBrand(GenericCatalogREQ request) {
+
+
+            try {
+
+                var brand = await _unitOfWork.ProductBrand.GetById((int)request.Id);
+                if(brand == null)
+                    throw new BusinessException("Marca no encontrado");
+
+                brand.Name = request.Name;
+                brand.Description = request.Description;
+
+                _unitOfWork.ProductBrand.Update(brand);
+                await _unitOfWork.SaveChangeAsync();
+
+                var response = new GenericCatalog {
+                    Id = brand.Id,
+                    Name = brand.Name,
+                    Description = brand.Description
+                };
+
+                return response;
+            }
+            catch(Exception ex) {
+
+                throw new BusinessException($"Ocurrió un error inesperado al intentar agregar marca\n{ex.Message}");
+            }
+        }
+
         #endregion
 
         #region Sale
@@ -976,4 +1036,3 @@ namespace Kikis_back_refaccionaria.Infrastructure.Repositories {
         #endregion
     }
 }
-//dotnet ef dbcontext scaffold "server=127.0.0.1;port=3306;user=root;password=password;database=kikis_ferreteria" Pomelo.EntityFrameworkCore.MySql -o Models --context TuDbContext --context-dir Context --use-database-names --no-onconfiguring --data-annotations

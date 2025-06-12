@@ -3,18 +3,19 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Kikis_back_refaccionaria.Core.Entities {
 
-    [Table("tbproductshelf")]
-    public partial class TbProductShelf {
+    [Table("tbdeliverydetailsstatus")]
+    public partial class TbDeliveryDetailsStatus {
+
         [Key]
         public int Id { get; set; }
 
         [StringLength(75)]
         public string Name { get; set; } = null!;
 
-        [StringLength(255)]
+        [StringLength(225)]
         public string? Description { get; set; }
 
-        [InverseProperty("ShelfNavigation")]
-        public virtual ICollection<TbProduct> TbProducts { get; set; } = new List<TbProduct>();
+        [InverseProperty("StatusNavigation")]
+        public virtual ICollection<TbDeliveryDetail> TbDeliveryDetails { get; set; } = new List<TbDeliveryDetail>();
     }
 }

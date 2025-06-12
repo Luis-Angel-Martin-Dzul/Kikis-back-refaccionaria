@@ -9,33 +9,19 @@ namespace Kikis_back_refaccionaria.Core.Entities {
     [Index("Rol", Name = "Rol")]
     public partial class TbPermission {
         [Key]
-        public int Id {
-            get; set;
-        }
+        public int Id { get; set; }
 
-        public int Rol {
-            get; set;
-        }
+        public int Rol { get; set; }
 
-        public int Module {
-            get; set;
-        }
+        public int Module { get; set; }
 
-        public bool CanAdd {
-            get; set;
-        }
+        public bool CanAdd { get; set; }
 
-        public bool CanEdit {
-            get; set;
-        }
+        public bool CanEdit { get; set; }
 
-        public bool CanDelete {
-            get; set;
-        }
+        public bool CanDelete { get; set; }
 
-        public bool CanView {
-            get; set;
-        }
+        public bool CanView { get; set; }
 
         [ForeignKey("Module")]
         [InverseProperty("TbPermissions")]
