@@ -83,12 +83,22 @@ namespace Kikis_back_refaccionaria.Core.Interfaces {
          *  POST
          */
 
+        Task<GenericCatalog> PostProductCategory(GenericCatalogREQ request);
         Task<GenericCatalog> PostProductBrand(GenericCatalogREQ request);
+        Task<GenericCatalog> PostProductKit(GenericCatalogREQ request);
+        Task<GenericCatalog> PostProductHallway(GenericCatalogREQ request);
+        Task<GenericCatalog> PostProductLevel(GenericCatalogREQ request);
+        Task<GenericCatalog> PostProductShelf(GenericCatalogREQ request);
 
         /*
          *  PUT
          */
+        Task<GenericCatalog> PutProductCategory(GenericCatalogREQ request);
         Task<GenericCatalog> PutProductBrand(GenericCatalogREQ request);
+        Task<GenericCatalog> PutProductKit(GenericCatalogREQ request);
+        Task<GenericCatalog> PutProductHallway(GenericCatalogREQ request);
+        Task<GenericCatalog> PutProductLevel(GenericCatalogREQ request);
+        Task<GenericCatalog> PutProductShelf(GenericCatalogREQ request);
 
 
         #endregion

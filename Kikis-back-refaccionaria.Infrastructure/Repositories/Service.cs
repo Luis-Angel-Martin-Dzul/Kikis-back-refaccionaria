@@ -691,7 +691,32 @@ namespace Kikis_back_refaccionaria.Infrastructure.Repositories {
         /*
          *  POST
          */
+        public async Task<GenericCatalog> PostProductCategory(GenericCatalogREQ request) {
 
+
+            try {
+
+                var category = new TbProductCategory {
+                    Name = request.Name,
+                    Description = request.Description
+                };
+
+                _unitOfWork.ProductCategory.Add(category);
+                await _unitOfWork.SaveChangeAsync();
+
+                var response = new GenericCatalog() {
+                    Id = category.Id,
+                    Name = category.Name,
+                    Description = category.Description
+                };
+
+                return response;
+            }
+            catch(Exception ex) {
+
+                throw new BusinessException($"Ocurrió un error inesperado al intentar agregar categoria\n{ex.Message}");
+            }
+        }
         public async Task<GenericCatalog> PostProductBrand(GenericCatalogREQ request) {
 
 
@@ -718,12 +743,140 @@ namespace Kikis_back_refaccionaria.Infrastructure.Repositories {
                 throw new BusinessException($"Ocurrió un error inesperado al intentar agregar marca\n{ex.Message}");
             }
         }
+        public async Task<GenericCatalog> PostProductKit(GenericCatalogREQ request) {
+
+            try {
+
+                var kit = new TbKit {
+                    Name = request.Name,
+                    Description = request.Description
+                };
+
+                _unitOfWork.Kit.Add(kit);
+                await _unitOfWork.SaveChangeAsync();
+
+                var response = new GenericCatalog() {
+                    Id = kit.Id,
+                    Name = kit.Name,
+                    Description = kit.Description
+                };
+
+                return response;
+            }
+            catch(Exception ex) {
+
+                throw new BusinessException($"Ocurrió un error inesperado al intentar agregar kit\n{ex.Message}");
+            }
+        }
+        public async Task<GenericCatalog> PostProductHallway(GenericCatalogREQ request) {
+
+            try {
+
+                var hallway = new TbProductHallway {
+                    Name = request.Name,
+                    Description = request.Description
+                };
+
+                _unitOfWork.ProductHallway.Add(hallway);
+                await _unitOfWork.SaveChangeAsync();
+
+                var response = new GenericCatalog() {
+                    Id = hallway.Id,
+                    Name = hallway.Name,
+                    Description = hallway.Description
+                };
+
+                return response;
+            }
+            catch(Exception ex) {
+
+                throw new BusinessException($"Ocurrió un error inesperado al intentar agregar pasillo\n{ex.Message}");
+            }
+        }
+        public async Task<GenericCatalog> PostProductLevel(GenericCatalogREQ request) {
+
+            try {
+
+                var level = new TbProductLevel {
+                    Name = request.Name,
+                    Description = request.Description
+                };
+
+                _unitOfWork.ProductLevel.Add(level);
+                await _unitOfWork.SaveChangeAsync();
+
+                var response = new GenericCatalog() {
+                    Id = level.Id,
+                    Name = level.Name,
+                    Description = level.Description
+                };
+
+                return response;
+            }
+            catch(Exception ex) {
+
+                throw new BusinessException($"Ocurrió un error inesperado al intentar agregar nivel\n{ex.Message}");
+            }
+        }
+        public async Task<GenericCatalog> PostProductShelf(GenericCatalogREQ request) {
+
+            try {
+
+                var shelf = new TbProductShelf {
+                    Name = request.Name,
+                    Description = request.Description
+                };
+
+                _unitOfWork.ProductShelf.Add(shelf);
+                await _unitOfWork.SaveChangeAsync();
+
+                var response = new GenericCatalog() {
+                    Id = shelf.Id,
+                    Name = shelf.Name,
+                    Description = shelf.Description
+                };
+
+                return response;
+            }
+            catch(Exception ex) {
+
+                throw new BusinessException($"Ocurrió un error inesperado al intentar agregar estante\n{ex.Message}");
+            }
+        }
 
 
 
         /*
          *  PUT
          */
+        public async Task<GenericCatalog> PutProductCategory(GenericCatalogREQ request) {
+
+
+            try {
+
+                var category = await _unitOfWork.ProductCategory.GetById((int)request.Id);
+                if(category == null)
+                    throw new BusinessException("Categoria no encontrado");
+
+                category.Name = request.Name;
+                category.Description = request.Description;
+
+                _unitOfWork.ProductCategory.Update(category);
+                await _unitOfWork.SaveChangeAsync();
+
+                var response = new GenericCatalog {
+                    Id = category.Id,
+                    Name = category.Name,
+                    Description = category.Description
+                };
+
+                return response;
+            }
+            catch(Exception ex) {
+
+                throw new BusinessException($"Ocurrió un error inesperado al intentar actualizar categoria\n{ex.Message}");
+            }
+        }
         public async Task<GenericCatalog> PutProductBrand(GenericCatalogREQ request) {
 
 
@@ -749,7 +902,115 @@ namespace Kikis_back_refaccionaria.Infrastructure.Repositories {
             }
             catch(Exception ex) {
 
-                throw new BusinessException($"Ocurrió un error inesperado al intentar agregar marca\n{ex.Message}");
+                throw new BusinessException($"Ocurrió un error inesperado al intentar actualizar marca\n{ex.Message}");
+            }
+        }
+        public async Task<GenericCatalog> PutProductKit(GenericCatalogREQ request) {
+
+            try {
+
+                var kit = await _unitOfWork.Kit.GetById((int)request.Id);
+                if(kit == null)
+                    throw new BusinessException("Kit no encontrado");
+
+                kit.Name = request.Name;
+                kit.Description = request.Description;
+
+                _unitOfWork.Kit.Update(kit);
+                await _unitOfWork.SaveChangeAsync();
+
+                var response = new GenericCatalog {
+                    Id = kit.Id,
+                    Name = kit.Name,
+                    Description = kit.Description
+                };
+
+                return response;
+            }
+            catch(Exception ex) {
+
+                throw new BusinessException($"Ocurrió un error inesperado al intentar actualizar kit\n{ex.Message}");
+            }
+        }
+        public async Task<GenericCatalog> PutProductHallway(GenericCatalogREQ request) {
+
+            try {
+
+                var hallway = await _unitOfWork.ProductHallway.GetById((int)request.Id);
+                if(hallway == null)
+                    throw new BusinessException("Pasillo no encontrado");
+
+                hallway.Name = request.Name;
+                hallway.Description = request.Description;
+
+                _unitOfWork.ProductHallway.Update(hallway);
+                await _unitOfWork.SaveChangeAsync();
+
+                var response = new GenericCatalog {
+                    Id = hallway.Id,
+                    Name = hallway.Name,
+                    Description = hallway.Description
+                };
+
+                return response;
+            }
+            catch(Exception ex) {
+
+                throw new BusinessException($"Ocurrió un error inesperado al intentar actualizar pasillo\n{ex.Message}");
+            }
+        }
+        public async Task<GenericCatalog> PutProductLevel(GenericCatalogREQ request) {
+
+            try {
+
+                var level = await _unitOfWork.ProductLevel.GetById((int)request.Id);
+                if(level == null)
+                    throw new BusinessException("Nivel no encontrado");
+
+                level.Name = request.Name;
+                level.Description = request.Description;
+
+                _unitOfWork.ProductLevel.Update(level);
+                await _unitOfWork.SaveChangeAsync();
+
+                var response = new GenericCatalog {
+                    Id = level.Id,
+                    Name = level.Name,
+                    Description = level.Description
+                };
+
+                return response;
+            }
+            catch(Exception ex) {
+
+                throw new BusinessException($"Ocurrió un error inesperado al intentar actualizar nivel\n{ex.Message}");
+            }
+        }
+        public async Task<GenericCatalog> PutProductShelf(GenericCatalogREQ request) {
+
+            try {
+
+                var shelf = await _unitOfWork.ProductShelf.GetById((int)request.Id);
+                if(shelf == null)
+                    throw new BusinessException("Estante no encontrado");
+
+                shelf.Name = request.Name;
+                shelf.Description = request.Description;
+
+                _unitOfWork.ProductShelf.Update(shelf);
+                await _unitOfWork.SaveChangeAsync();
+
+                var response = new GenericCatalog {
+                    Id = shelf.Id,
+                    Name = shelf.Name,
+                    Description = shelf.Description
+                };
+
+                return response;
+            }
+            catch(Exception ex) {
+
+                throw new BusinessException($"Ocurrió un error inesperado al intentar actualizar estante\n{ex.Message}");
             }
         }
 
