@@ -21,7 +21,7 @@ namespace Kikis_back_refaccionaria.Core.Request {
 
     public class SaleDetailREQ
     {
-        public String Name { get; set; }
+        public string Name { get; set; }
 
         public int Product { get; set; }
 

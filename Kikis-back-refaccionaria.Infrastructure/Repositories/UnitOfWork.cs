@@ -9,6 +9,7 @@ namespace Kikis_back_refaccionaria.Infrastructure.Repositories {
         private readonly KikisDbContext _context;
         private IDbContextTransaction _transaction;
 
+        private readonly IRepository<TbDeliveryDetail> _deliveryDetail;
         private readonly IRepository<TbKit> _kit;
         private readonly IRepository<TbRol> _rol;
         private readonly IRepository<TbPermission> _permission;
@@ -29,6 +30,7 @@ namespace Kikis_back_refaccionaria.Infrastructure.Repositories {
             _context = context;
         }
 
+        public IRepository<TbDeliveryDetail> DeliveryDetail => _deliveryDetail ?? new Repository<TbDeliveryDetail>(_context);
         public IRepository<TbKit> Kit => _kit ?? new Repository<TbKit>(_context);
         public IRepository<TbRol> Rol => _rol ?? new Repository<TbRol>(_context);
         public IRepository<TbPermission> Permission => _permission ?? new Repository<TbPermission>(_context);

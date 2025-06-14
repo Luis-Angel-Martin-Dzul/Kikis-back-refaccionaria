@@ -21,6 +21,109 @@ namespace Kikis_back_refaccionaria.Infrastructure.Repositories {
             _emailService = emailService;
         }
 
+        #region Delivery
+        /*
+         *  GET
+         */
+        public async Task<IEnumerable<DeliveryDetailRES>> GetDeliveryDetails(DeliveryDetailsFilter filter) {
+
+            //query
+            var query = _unitOfWork.DeliveryDetail
+                .GetQuery()
+                .Include(x => x.StatusNavigation)
+                .AsNoTracking();
+
+            //filter
+            if(filter.Id != null)
+                query = query.Where(x => x.Id == filter.Id);
+
+            //select
+            var response = await query.Select(x => new DeliveryDetailRES {
+                Id = x.Id,
+                Delivery = x.Delivery,
+                Sale = x.Sale,
+                Responsible = x.Responsible,
+                Address = x.Address,
+                Latitude = x.Latitude,
+                Longitude = x.Longitude,
+                Status = new GenericCatalog {
+                    Id = x.StatusNavigation.Id,
+                    Name = x.StatusNavigation.Name,
+                },
+                Comments = x.Comments,
+                CreateDate = x.CreateDate,
+            }).ToListAsync();
+
+            return response;
+        }
+
+        /*
+         *  POST
+         */
+        public async Task<DeliveryDetailRES> PostDeliveryDetail(DeliveryDetailREQ request) {
+            try {
+
+                var delivery = new TbDeliveryDetail {
+
+                    Delivery = request.Delivery,
+                    Sale = request.Sale,
+                    Responsible = request.Responsible,
+                    Address = request.Address,
+                    Latitude = request.Latitude,
+                    Longitude = request.Longitude,
+                    Status = request.Status.Id,
+                    Comments = request.Comments,
+                    CreateDate = request.CreateDate,
+                };
+
+                _unitOfWork.DeliveryDetail.Add(delivery);
+                await _unitOfWork.SaveChangeAsync();
+
+                var lastInsert = await GetDeliveryDetails(new DeliveryDetailsFilter { Id = delivery.Id });
+                var response = lastInsert.FirstOrDefault();
+
+                return response;
+            }
+            catch(Exception ex) {
+
+                throw new BusinessException($"Ocurrió un error inesperado al intentar agregar entrega\n{ex.Message}");
+            }
+        }
+
+        /*
+         *  PUT
+         */
+        public async Task<DeliveryDetailRES> PutDeliveryDetail(DeliveryDetailREQ request) {
+            try {
+
+                var delivery = new TbDeliveryDetail {
+
+                    Delivery = request.Delivery,
+                    Sale = request.Sale,
+                    Responsible = request.Responsible,
+                    Address = request.Address,
+                    Latitude = request.Latitude,
+                    Longitude = request.Longitude,
+                    Status = request.Status.Id,
+                    Comments = request.Comments,
+                    CreateDate = request.CreateDate,
+                };
+
+                _unitOfWork.DeliveryDetail.Update(delivery);
+                await _unitOfWork.SaveChangeAsync();
+
+                var lastInsert = await GetDeliveryDetails(new DeliveryDetailsFilter { Id = delivery.Id });
+                var response = lastInsert.FirstOrDefault();
+
+                return response;
+            }
+            catch(Exception ex) {
+
+                throw new BusinessException($"Ocurrió un error inesperado al intentar agregar entrega\n{ex.Message}");
+            }
+        }
+        #endregion
+
         #region User
         /*
          *  GET
@@ -73,6 +176,8 @@ namespace Kikis_back_refaccionaria.Infrastructure.Repositories {
             //filter
             if(filter.Id != null)
                 query = query.Where(x => x.Id == filter.Id);
+            if(filter.Roles != null && filter.Roles.Any())
+                query = query.Where(x => filter.Roles.Contains(x.Rol));
 
             //select
             var users = await query.Select(x => new UserRES {

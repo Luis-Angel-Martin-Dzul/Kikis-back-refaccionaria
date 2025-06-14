@@ -3,6 +3,7 @@
 namespace Kikis_back_refaccionaria.Core.Interfaces {
     public interface IUnitOfWork : IDisposable {
 
+        IRepository<TbDeliveryDetail> DeliveryDetail { get; }
         IRepository<TbKit> Kit { get; }
         IRepository<TbPermission> Permission { get; }
         IRepository<TbProduct> Product { get; }

@@ -5,6 +5,25 @@ using Kikis_back_refaccionaria.Core.Responses;
 namespace Kikis_back_refaccionaria.Core.Interfaces {
     public interface IService {
 
+
+        #region Delivery
+        /*
+         *  GET
+         */
+        Task<IEnumerable<DeliveryDetailRES>> GetDeliveryDetails(DeliveryDetailsFilter filter);
+
+        /*
+         *  POST
+         */
+        Task<DeliveryDetailRES> PostDeliveryDetail(DeliveryDetailREQ request);
+
+        /*
+         *  PUT
+         */
+        Task<DeliveryDetailRES> PutDeliveryDetail(DeliveryDetailREQ request);
+
+        #endregion
+
         #region User
 
         /*

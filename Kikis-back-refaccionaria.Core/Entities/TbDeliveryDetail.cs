@@ -12,7 +12,7 @@ namespace Kikis_back_refaccionaria.Core.Entities {
         [Key]
         public int Id { get; set; }
 
-        public int Delivery { get; set; }
+        public int? Delivery { get; set; }
 
         public int Sale { get; set; }
 
@@ -31,7 +31,10 @@ namespace Kikis_back_refaccionaria.Core.Entities {
         public int Status { get; set; }
 
         [StringLength(255)]
-        public string Comments { get; set; } = null!;
+        public string? Comments { get; set; } = null!;
+
+        [Column(TypeName = "datetime")]
+        public DateTime CreateDate { get; set; }
 
         [ForeignKey("Delivery")]
         [InverseProperty("TbDeliveryDetails")]
