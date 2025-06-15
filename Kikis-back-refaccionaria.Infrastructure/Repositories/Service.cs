@@ -40,7 +40,6 @@ namespace Kikis_back_refaccionaria.Infrastructure.Repositories {
             //select
             var response = await query.Select(x => new DeliveryDetailRES {
                 Id = x.Id,
-                Delivery = x.Delivery,
                 Sale = x.Sale,
                 Responsible = x.Responsible,
                 Address = x.Address,
@@ -65,7 +64,6 @@ namespace Kikis_back_refaccionaria.Infrastructure.Repositories {
 
                 var delivery = new TbDeliveryDetail {
 
-                    Delivery = request.Delivery,
                     Sale = request.Sale,
                     Responsible = request.Responsible,
                     Address = request.Address,
@@ -97,8 +95,7 @@ namespace Kikis_back_refaccionaria.Infrastructure.Repositories {
             try {
 
                 var delivery = new TbDeliveryDetail {
-
-                    Delivery = request.Delivery,
+                    Id = (int)request.Id,
                     Sale = request.Sale,
                     Responsible = request.Responsible,
                     Address = request.Address,

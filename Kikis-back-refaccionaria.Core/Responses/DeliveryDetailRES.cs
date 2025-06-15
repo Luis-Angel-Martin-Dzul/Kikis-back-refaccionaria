@@ -3,8 +3,6 @@
 
         public int Id { get; set; }
 
-        public int? Delivery { get; set; }
-
         public int Sale { get; set; }
 
         public string Responsible { get; set; } = null!;

@@ -3,7 +3,7 @@
 namespace Kikis_back_refaccionaria.Core.Request {
     public class DeliveryDetailREQ {
 
-        public int? Delivery { get; set; }
+        public int? Id { get; set; }
 
         public int Sale { get; set; }
 

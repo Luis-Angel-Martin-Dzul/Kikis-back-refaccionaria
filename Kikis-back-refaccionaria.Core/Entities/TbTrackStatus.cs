@@ -3,8 +3,8 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Kikis_back_refaccionaria.Core.Entities {
 
-    [Table("tbdeliverystatus")]
-    public partial class TbDeliveryStatus {
+    [Table("tbtrackstatus")]
+    public partial class TbTrackStatus {
 
         [Key]
         public int Id { get; set; }
@@ -16,6 +16,6 @@ namespace Kikis_back_refaccionaria.Core.Entities {
         public string? Description { get; set; }
 
         [InverseProperty("StatusNavigation")]
-        public virtual ICollection<TbDelivery> TbDeliveries { get; set; } = new List<TbDelivery>();
+        public virtual ICollection<TbTrack> TbTracks { get; set; } = new List<TbTrack>();
     }
 }
