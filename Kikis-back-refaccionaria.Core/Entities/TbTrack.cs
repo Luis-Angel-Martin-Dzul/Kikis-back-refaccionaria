@@ -2,6 +2,8 @@
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Kikis_back_refaccionaria.Core.Entities {
+
+    [Table("tbtrack")]
     public partial class TbTrack {
 
         [Key]
@@ -14,7 +16,7 @@ namespace Kikis_back_refaccionaria.Core.Entities {
 
         public int Status { get; set; }
 
-        public sbyte IsActive { get; set; }
+        public bool IsActive { get; set; }
 
         [ForeignKey("Status")]
         [InverseProperty("TbTracks")]

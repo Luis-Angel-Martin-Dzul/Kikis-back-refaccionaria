@@ -17,6 +17,14 @@ namespace Kikis_back_refaccionaria.Controllers {
         /*
          *  GET
          */
+        [Route("track/")]
+        [HttpGet]
+        public async Task<IActionResult> GetTracks([FromQuery] TrackFilter filter) {
+
+            var data = await _service.GetTracks(filter);
+            var response = new ApiResponse<IEnumerable<TrackRES>>(data);
+            return Ok(response);
+        }
         [Route("details/")]
         [HttpGet]
         public async Task<IActionResult> GetDeliveryDetails([FromQuery] DeliveryDetailsFilter filter) {
@@ -29,6 +37,14 @@ namespace Kikis_back_refaccionaria.Controllers {
         /*
          *  POST
          */
+        [Route("track/")]
+        [HttpPost]
+        public async Task<IActionResult> PostTrack(TrackREQ request) {
+
+            var data = await _service.PostTrack(request);
+            var response = new ApiResponse<TrackRES>(data);
+            return Ok(response);
+        }
         [Route("details/")]
         [HttpPost]
         public async Task<IActionResult> PostDeliveryDetails([FromBody] DeliveryDetailREQ request) {
@@ -41,6 +57,14 @@ namespace Kikis_back_refaccionaria.Controllers {
         /*
          *  PUT
          */
+        [Route("track/")]
+        [HttpPut]
+        public async Task<IActionResult> PutTrack([FromBody] TrackREQ request) {
+
+            var data = await _service.PutTrack(request);
+            var response = new ApiResponse<TrackRES>(data);
+            return Ok(response);
+        }
         [Route("details/")]
         [HttpPut]
         public async Task<IActionResult> PutDeliveryDetails([FromBody] DeliveryDetailREQ request) {

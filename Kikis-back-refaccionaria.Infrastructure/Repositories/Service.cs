@@ -56,9 +56,61 @@ namespace Kikis_back_refaccionaria.Infrastructure.Repositories {
             return response;
         }
 
+        public async Task<IEnumerable<TrackRES>> GetTracks(TrackFilter filter) {
+
+            //query
+            var query = _unitOfWork.Track
+                .GetQuery()
+                .Include(x => x.StatusNavigation)
+                .AsNoTracking();
+
+            //filter
+            if(filter.Id != null)
+                query = query.Where(x => x.Id == filter.Id);
+
+            //select
+            var response = await query.Select(x => new TrackRES {
+                Id = x.Id,
+                User = x.User,
+                CreateDate = x.CreateDate,
+                Status = new GenericCatalog {
+                    Id = x.StatusNavigation.Id,
+                    Name = x.StatusNavigation.Name,
+                },
+                IsActive = x.IsActive,
+                
+            }).ToListAsync();
+
+            return response;
+        }
+
         /*
          *  POST
          */
+        public async Task<TrackRES> PostTrack(TrackREQ request) {
+
+            try {
+
+                var track = new TbTrack {
+                    User = request.User,
+                    CreateDate = request.CreateDate,
+                    Status = 1,
+                    IsActive = true,
+                };
+
+                _unitOfWork.Track.Add(track);
+                await _unitOfWork.SaveChangeAsync();
+
+                var lastInsert = await GetTracks(new TrackFilter { Id = track.Id });
+                var response = lastInsert.FirstOrDefault();
+
+                return response;
+            }
+            catch(Exception ex) {
+
+                throw new BusinessException($"Ocurrió un error inesperado al intentar agregar ruta\n{ex.Message}");
+            }
+        }
         public async Task<DeliveryDetailRES> PostDeliveryDetail(DeliveryDetailREQ request) {
             try {
 
@@ -91,6 +143,31 @@ namespace Kikis_back_refaccionaria.Infrastructure.Repositories {
         /*
          *  PUT
          */
+        public async Task<TrackRES> PutTrack(TrackREQ request) {
+
+            try {
+
+                var track = new TbTrack {
+                    Id = (int)request.Id,
+                    User = request.User,
+                    CreateDate = request.CreateDate,
+                    Status = request.Status.Id,
+                    IsActive = request.IsActive
+                };
+
+                _unitOfWork.Track.Update(track);
+                await _unitOfWork.SaveChangeAsync();
+
+                var lastInsert = await GetTracks(new TrackFilter { Id = track.Id });
+                var response = lastInsert.FirstOrDefault();
+
+                return response;
+            }
+            catch(Exception ex) {
+
+                throw new BusinessException($"Ocurrió un error inesperado al intentar agregar entrega\n{ex.Message}");
+            }
+        }
         public async Task<DeliveryDetailRES> PutDeliveryDetail(DeliveryDetailREQ request) {
             try {
 
