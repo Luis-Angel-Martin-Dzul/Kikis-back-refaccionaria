@@ -1,9 +1,13 @@
-﻿namespace Kikis_back_refaccionaria.Core.Responses {
+﻿using Kikis_back_refaccionaria.Core.Request;
+
+namespace Kikis_back_refaccionaria.Core.Responses {
     public class TrackRES {
 
         public int Id { get; set; }
 
-        public int User { get; set; }
+        public string Name { get; set; }
+
+        public UserREQ User { get; set; }
 
         public DateTime CreateDate { get; set; }
 
@@ -11,6 +15,6 @@
 
         public bool IsActive { get; set; }
 
-        public DeliveryDetailRES? Deliveries { get; set; }
+        public List<DeliveryDetailRES>? Deliveries { get; set; }
     }
 }

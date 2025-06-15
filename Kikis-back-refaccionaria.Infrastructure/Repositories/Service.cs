@@ -36,6 +36,8 @@ namespace Kikis_back_refaccionaria.Infrastructure.Repositories {
             //filter
             if(filter.Id != null)
                 query = query.Where(x => x.Id == filter.Id);
+            if(filter.Status != null)
+                query = query.Where(x => x.Status == filter.Status);
 
             //select
             var response = await query.Select(x => new DeliveryDetailRES {
@@ -62,27 +64,83 @@ namespace Kikis_back_refaccionaria.Infrastructure.Repositories {
             var query = _unitOfWork.Track
                 .GetQuery()
                 .Include(x => x.StatusNavigation)
+                .Include(x => x.UserNavigation)
+                .Include(x => x.TbTrackDeliveries)
+                    .ThenInclude(td => td.DeliveryNavigation)
+                    .ThenInclude(d => d.StatusNavigation)
                 .AsNoTracking();
 
             //filter
             if(filter.Id != null)
                 query = query.Where(x => x.Id == filter.Id);
 
+            query = query.Where(x => x.IsActive == true);
+
             //select
             var response = await query.Select(x => new TrackRES {
                 Id = x.Id,
-                User = x.User,
+                Name = x.Name,
+                User = new UserREQ {
+                    Id = x.UserNavigation.Id,
+                    FirstName = x.UserNavigation.FirstName,
+                    LastName = x.UserNavigation.LastName,
+                    Email = x.UserNavigation.Email,
+                    Curp = x.UserNavigation.Curp,
+                    CreateDate = x.UserNavigation.CreateDate,
+                },
                 CreateDate = x.CreateDate,
                 Status = new GenericCatalog {
                     Id = x.StatusNavigation.Id,
                     Name = x.StatusNavigation.Name,
                 },
-                IsActive = x.IsActive,
+                Deliveries = x.TbTrackDeliveries.Select(td => new DeliveryDetailRES {
+                    Id = td.DeliveryNavigation.Id,
+                    Sale = td.DeliveryNavigation.Sale,
+                    Responsible = td.DeliveryNavigation.Responsible,
+                    Address = td.DeliveryNavigation.Address,
+                    Latitude = td.DeliveryNavigation.Latitude,
+                    Longitude = td.DeliveryNavigation.Longitude,
+                    Comments = td.DeliveryNavigation.Comments ?? "",
+                    CreateDate = td.DeliveryNavigation.CreateDate,
+                    Status = new GenericCatalog {
+                        Id = td.DeliveryNavigation.StatusNavigation.Id,
+                        Name = td.DeliveryNavigation.StatusNavigation.Name
+                    }
+                }).ToList(),
+                IsActive = x.IsActive
                 
             }).ToListAsync();
 
             return response;
         }
+
+
+
+        /*
+         *  DELETE
+         */
+        public async Task<bool> DeleteTrack(int id) {
+
+            try {
+
+                var track = await _unitOfWork.Track.GetById(id);
+                if(track == null)
+                    throw new BusinessException("Ruta no encontrada");
+
+                track.IsActive = false;
+
+                _unitOfWork.Track.Update(track);
+                await _unitOfWork.SaveChangeAsync();
+
+                return true;
+            }
+            catch(Exception ex) {
+
+                throw new BusinessException($"Error al eliminar: {ex.Message}");
+            }
+        }
+
+
 
         /*
          *  POST
@@ -90,20 +148,53 @@ namespace Kikis_back_refaccionaria.Infrastructure.Repositories {
         public async Task<TrackRES> PostTrack(TrackREQ request) {
 
             try {
+                await _unitOfWork.BeginTransactionAsync();
 
+
+                //track
                 var track = new TbTrack {
                     User = request.User,
+                    Name = request.Name,
                     CreateDate = request.CreateDate,
-                    Status = 1,
+                    Status = request.Deliveries.Count >= 1 ? 2 : 1,
                     IsActive = true,
                 };
 
                 _unitOfWork.Track.Add(track);
                 await _unitOfWork.SaveChangeAsync();
 
+
+                //track delivery
+                var deliveries = request.Deliveries.Select(x => new TbTrackDelivery {
+
+                    Track = track.Id,
+                    Delivery = x.Delivery,
+                });
+                _unitOfWork.TrackDelivery.AddRange(deliveries);
+                await _unitOfWork.SaveChangeAsync();
+
+
+                //delivery update
+                var deliveryIds = request.Deliveries.Select(d => d.Delivery).ToList();
+                var deliveryDetails = await _unitOfWork.DeliveryDetail
+                    .GetQuery()
+                    .Where(d => deliveryIds.Contains(d.Id))
+                    .ToListAsync();
+
+                foreach(var delivery in deliveryDetails) {
+                    delivery.Status = 2; //Pendiente
+                }
+
+                _unitOfWork.DeliveryDetail.UpdateRange(deliveryDetails);
+                await _unitOfWork.SaveChangeAsync();
+
+
+
+                //response
                 var lastInsert = await GetTracks(new TrackFilter { Id = track.Id });
                 var response = lastInsert.FirstOrDefault();
 
+                await _unitOfWork.CommitTransactionAsync();
                 return response;
             }
             catch(Exception ex) {
@@ -149,6 +240,7 @@ namespace Kikis_back_refaccionaria.Infrastructure.Repositories {
 
                 var track = new TbTrack {
                     Id = (int)request.Id,
+                    Name = request.Name,
                     User = request.User,
                     CreateDate = request.CreateDate,
                     Status = request.Status.Id,

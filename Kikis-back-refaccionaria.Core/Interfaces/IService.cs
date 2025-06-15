@@ -14,6 +14,11 @@ namespace Kikis_back_refaccionaria.Core.Interfaces {
         Task<IEnumerable<TrackRES>> GetTracks(TrackFilter filter);
 
         /*
+         *  DELETE
+         */
+        Task<bool> DeleteTrack(int id);
+
+        /*
          *  POST
          */
         Task<TrackRES> PostTrack(TrackREQ request);

@@ -18,6 +18,7 @@ namespace Kikis_back_refaccionaria.Core.Interfaces {
         IRepository<TbSale> Sale { get; }
         IRepository<TbSaleDetail> SaleDetail { get; }
         IRepository<TbSupplier> Supplier { get; }
+        IRepository<TbTrackDelivery> TrackDelivery { get; }
         IRepository<TbTrack> Track { get; }
         IRepository<TbUser> User { get; }
 

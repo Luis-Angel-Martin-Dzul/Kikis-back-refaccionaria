@@ -40,5 +40,8 @@ namespace Kikis_back_refaccionaria.Core.Entities {
         [ForeignKey("Status")]
         [InverseProperty("TbDeliveryDetails")]
         public virtual TbDeliveryDetailsStatus StatusNavigation { get; set; } = null!;
+
+        [InverseProperty("DeliveryNavigation")]
+        public virtual ICollection<TbTrackDelivery> TbTrackDeliveries { get; set; } = new List<TbTrackDelivery>();
     }
 }

@@ -41,6 +41,8 @@ namespace Kikis_back_refaccionaria.Infrastructure.Data {
 
         public virtual DbSet<TbSupplier> TbSuppliers { get; set; }
 
+        public virtual DbSet<TbTrackDelivery> TbTrackDeliveries { get; set; }
+
         public virtual DbSet<TbTrack> TbTracks { get; set; }
 
         public virtual DbSet<TbTrackStatus> TbTrackStatuses { get; set; }
@@ -202,6 +204,19 @@ namespace Kikis_back_refaccionaria.Infrastructure.Data {
             modelBuilder.Entity<TbSupplier>(entity =>
             {
                 entity.HasKey(e => e.Id).HasName("PRIMARY");
+            });
+
+            modelBuilder.Entity<TbTrackDelivery>(entity =>
+            {
+                entity.HasKey(e => e.Id).HasName("PRIMARY");
+
+                entity.HasOne(d => d.DeliveryNavigation).WithMany(p => p.TbTrackDeliveries)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("tbtrackdelivery_ibfk_2");
+
+                entity.HasOne(d => d.TrackNavigation).WithMany(p => p.TbTrackDeliveries)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("tbtrackdelivery_ibfk_1");
             });
 
             modelBuilder.Entity<TbTrack>(entity =>

@@ -9,6 +9,8 @@ namespace Kikis_back_refaccionaria.Core.Entities {
         [Key]
         public int Id { get; set; }
 
+        public string Name { get; set; }
+
         public int User { get; set; }
 
         [Column(TypeName = "datetime")]
@@ -25,5 +27,8 @@ namespace Kikis_back_refaccionaria.Core.Entities {
         [ForeignKey("User")]
         [InverseProperty("TbTracks")]
         public virtual TbUser UserNavigation { get; set; } = null!;
+
+        [InverseProperty("TrackNavigation")]
+        public virtual ICollection<TbTrackDelivery> TbTrackDeliveries { get; set; } = new List<TbTrackDelivery>();
     }
 }

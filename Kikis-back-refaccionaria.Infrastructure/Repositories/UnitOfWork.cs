@@ -24,6 +24,7 @@ namespace Kikis_back_refaccionaria.Infrastructure.Repositories {
         private readonly IRepository<TbSale> _sale;
         private readonly IRepository<TbSaleDetail> _saleDetail;
         private readonly IRepository<TbSupplier> _supplier;
+        private readonly IRepository<TbTrackDelivery> _trackDeliveries;
         private readonly IRepository<TbTrack> _track;
         private readonly IRepository<TbUser> _user;
 
@@ -46,6 +47,7 @@ namespace Kikis_back_refaccionaria.Infrastructure.Repositories {
         public IRepository<TbSale> Sale => _sale ?? new Repository<TbSale>(_context);
         public IRepository<TbSaleDetail> SaleDetail => _saleDetail ?? new Repository<TbSaleDetail>(_context);
         public IRepository<TbSupplier> Supplier => _supplier ?? new Repository<TbSupplier>(_context);
+        public IRepository<TbTrackDelivery> TrackDelivery => _trackDeliveries ?? new Repository<TbTrackDelivery>(_context);
         public IRepository<TbTrack> Track => _track ?? new Repository<TbTrack>(_context);
         public IRepository<TbUser> User => _user ?? new Repository<TbUser>(_context);
 

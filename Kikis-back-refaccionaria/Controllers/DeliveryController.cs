@@ -35,6 +35,18 @@ namespace Kikis_back_refaccionaria.Controllers {
         }
 
         /*
+         *  DELETE
+         */
+        [HttpDelete("track/{id}")]
+        public async Task<IActionResult> DeleteTrack(int id) {
+
+            var data = await _service.DeleteTrack(id);
+            var response = new ApiResponse<bool>(data);
+            return Ok(response);
+        }
+
+
+        /*
          *  POST
          */
         [Route("track/")]
