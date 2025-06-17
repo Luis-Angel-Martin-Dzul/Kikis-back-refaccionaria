@@ -237,21 +237,70 @@ namespace Kikis_back_refaccionaria.Infrastructure.Repositories {
         public async Task<TrackRES> PutTrack(TrackREQ request) {
 
             try {
+                await _unitOfWork.BeginTransactionAsync();
 
-                var track = new TbTrack {
-                    Id = (int)request.Id,
-                    Name = request.Name,
-                    User = request.User,
-                    CreateDate = request.CreateDate,
-                    Status = request.Status.Id,
-                    IsActive = request.IsActive
-                };
+                //track
+                var track = await _unitOfWork.Track.GetById((int)request.Id);
+                track.Name = request.Name;
+                track.User = request.User;
 
                 _unitOfWork.Track.Update(track);
                 await _unitOfWork.SaveChangeAsync();
 
+                //track delivery
+                var trackDeliverySave = await _unitOfWork.TrackDelivery
+                    .GetQuery()
+                    .Where(x => x.Track == request.Id)
+                    .ToListAsync();
+
+                var trackDeliveryMap = request.Deliveries.Select(x => new TbTrackDelivery {
+                    Track = (int)request.Id,
+                    Delivery = x.Delivery,
+                }).ToList();
+
+                //deletes
+                var removed = trackDeliverySave.Where(x => !trackDeliveryMap.Any(s => s.Delivery == x.Delivery)).ToList();
+                if(removed.Any()) {
+                
+                    _unitOfWork.TrackDelivery.DeleteRange(removed);
+                    await _unitOfWork.SaveChangeAsync();
+                }
+
+                //adds
+                var news = trackDeliveryMap.Where(x => !trackDeliverySave.Any(s => s.Delivery == x.Delivery)).ToList();
+                if(news.Any()) {
+
+                    _unitOfWork.TrackDelivery.AddRange(news);
+                    await _unitOfWork.SaveChangeAsync();
+                }
+
+                //update
+                var dDeliveryIds = removed.Select(d => d.Delivery).ToList();
+                var dDeliveryDetails = await _unitOfWork.DeliveryDetail
+                    .GetQuery()
+                    .Where(d => dDeliveryIds.Contains(d.Id))
+                    .ToListAsync();
+                foreach(var delivery in dDeliveryDetails) delivery.Status = 1; //Creado
+                
+                _unitOfWork.DeliveryDetail.UpdateRange(dDeliveryDetails);
+
+
+                var AdeliveryIds = news.Select(d => d.Delivery).ToList();
+                var AdeliveryDetails = await _unitOfWork.DeliveryDetail
+                    .GetQuery()
+                    .Where(d => AdeliveryIds.Contains(d.Id))
+                    .ToListAsync();
+                foreach(var delivery in AdeliveryDetails) delivery.Status = 2; //Pendiente
+                
+                _unitOfWork.DeliveryDetail.UpdateRange(AdeliveryDetails);
+                await _unitOfWork.SaveChangeAsync();
+
+
+
                 var lastInsert = await GetTracks(new TrackFilter { Id = track.Id });
                 var response = lastInsert.FirstOrDefault();
+
+                await _unitOfWork.CommitTransactionAsync();
 
                 return response;
             }
