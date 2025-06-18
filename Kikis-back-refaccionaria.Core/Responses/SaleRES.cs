@@ -17,6 +17,8 @@
 
         public List<SaleDetail> SaleDetails { get; set; }
 
+        public int Invoice { get; set; }
+
     }
 
     public class SaleDetail

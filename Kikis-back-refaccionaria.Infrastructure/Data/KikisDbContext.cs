@@ -11,6 +11,8 @@ namespace Kikis_back_refaccionaria.Infrastructure.Data {
 
         public virtual DbSet<TbDeliveryDetailsStatus> TbDeliveryDetailsStatuses { get; set; }
 
+        public virtual DbSet<TbInvoice> TbInvoices { get; set; }
+
         public virtual DbSet<TbKit> TbKits { get; set; }
 
         public virtual DbSet<tbmodule> tbmodules { get; set; }
@@ -70,6 +72,15 @@ namespace Kikis_back_refaccionaria.Infrastructure.Data {
             modelBuilder.Entity<TbDeliveryDetailsStatus>(entity =>
             {
                 entity.HasKey(e => e.Id).HasName("PRIMARY");
+            });
+
+            modelBuilder.Entity<TbInvoice>(entity =>
+            {
+                entity.HasKey(e => e.Id).HasName("PRIMARY");
+
+                entity.HasOne(d => d.SaleNavigation).WithMany(p => p.TbInvoices)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("tbinvoices_ibfk_1");
             });
 
             modelBuilder.Entity<TbKit>(entity =>

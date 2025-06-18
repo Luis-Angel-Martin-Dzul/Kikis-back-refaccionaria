@@ -25,6 +25,14 @@ namespace Kikis_back_refaccionaria.Controllers {
             var response = new ApiResponse<IEnumerable<SaleRES>>(data);
             return Ok(response);
         }
+        [Route("invoice/")]
+        [HttpGet]
+        public async Task<IActionResult> GetTools([FromQuery] InvoiceFilter filter) {
+
+            var data = await _service.GetInvoices(filter);
+            var response = new ApiResponse<IEnumerable<InvoiceRES>>(data);
+            return Ok(response);
+        }
 
 
         /*
@@ -46,6 +54,22 @@ namespace Kikis_back_refaccionaria.Controllers {
         public async Task<IActionResult> PostSales(SaleREQ request) {
 
             var data = await _service.PostSales(request);
+            var response = new ApiResponse<bool>(data);
+            return Ok(response);
+        }
+        [Route("invoice/")]
+        [HttpPost]
+        public async Task<IActionResult> PostInvoice(InvoiceREQ request) {
+
+            var data = await _service.PostInvoice(request);
+            var response = new ApiResponse<int>(data);
+            return Ok(response);
+        }
+        [Route("invoice/try/")]
+        [HttpPost]
+        public async Task<IActionResult> PostTryInvoice(InvoiceTryREQ request) {
+
+            var data = await _service.PostTryInvoice(request);
             var response = new ApiResponse<bool>(data);
             return Ok(response);
         }

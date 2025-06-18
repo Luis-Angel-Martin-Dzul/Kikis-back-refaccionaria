@@ -35,6 +35,9 @@ namespace Kikis_back_refaccionaria.Core.Entities {
         public virtual ICollection<TbDeliveryDetail> TbDeliveryDetails { get; set; } = new List<TbDeliveryDetail>();
 
         [InverseProperty("SaleNavigation")]
+        public virtual ICollection<TbInvoice> TbInvoices { get; set; } = new List<TbInvoice>();
+
+        [InverseProperty("SaleNavigation")]
         public virtual ICollection<TbSaleDetail> TbSaleDetails { get; set; } = new List<TbSaleDetail>();
     }
 }

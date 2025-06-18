@@ -135,12 +135,15 @@ namespace Kikis_back_refaccionaria.Core.Interfaces {
          *  GET
          */
         Task<IEnumerable<SaleRES>> GetSales(SaleFilter filter);
+        Task<IEnumerable<InvoiceRES>> GetInvoices(InvoiceFilter filter);
 
 
         /*
          *  POST
          */
         Task<bool> PostSales(SaleREQ request);
+        Task<int> PostInvoice(InvoiceREQ request);
+        Task<bool> PostTryInvoice(InvoiceTryREQ request);
 
 
         /*

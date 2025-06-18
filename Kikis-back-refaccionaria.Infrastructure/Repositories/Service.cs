@@ -1348,9 +1348,7 @@ namespace Kikis_back_refaccionaria.Infrastructure.Repositories {
                 .Include(sale => sale.SellerNavigation)
                 .Include(sale => sale.TbSaleDetails)
                     .ThenInclude(sale => sale.ProductNavigation)
-                .AsNoTracking();
-            var products = _unitOfWork.Product
-                .GetQuery()
+                .Include(sale => sale.TbInvoices)
                 .AsNoTracking();
 
             //filter
@@ -1377,10 +1375,41 @@ namespace Kikis_back_refaccionaria.Infrastructure.Repositories {
                     PriceUnit = sale.PriceUnit,
                     Quantity = sale.Quantity,
                     Total = sale.Total,
-                }).ToList()
+                }).ToList(),
+                Invoice = sale.TbInvoices.Count() == 0 ? 0 : sale.TbInvoices.FirstOrDefault().Id
             }).ToListAsync();
 
             return sales;
+        }
+
+        public async Task<IEnumerable<InvoiceRES>> GetInvoices(InvoiceFilter filter) {
+
+            //query
+            var query = _unitOfWork.Invoice
+                .GetQuery()
+                .AsNoTracking();
+
+            //filter
+            if(filter.Id != null)
+                query = query.Where(x => x.Id == filter.Id);
+
+            //select
+            var invoices = await query.Select(invoice => new InvoiceRES {
+                
+                Id = invoice.Id,
+                Sale = invoice.Sale,
+                Name = invoice.Name,
+                RFC = invoice.RFC,
+                CodePostal = invoice.CodePostal,
+                Contact = invoice.Contact,
+                TaxRegime = invoice.TaxRegime,
+                TaxRegimeName = invoice.TaxRegimeName,
+                UseCFDI = invoice.UseCFDI,
+                UseCFDIName = invoice.UseCFDIName,
+                CreateDate = invoice.CreateDate,
+            }).ToListAsync();
+
+            return invoices;
         }
 
 
@@ -1445,6 +1474,74 @@ namespace Kikis_back_refaccionaria.Infrastructure.Repositories {
                 throw new BusinessException($"Ocurrió un error inesperado al intentar guardar la compra\n{ex.Message}");
             }
         }
+        public async Task<int> PostInvoice(InvoiceREQ request) {
+
+            try {
+
+                //add sale
+                var invoice = new TbInvoice {
+                    Sale = request.Sale,
+                    Name = request.Name,
+                    RFC = request.RFC,
+                    TaxRegime = request.TaxRegime,
+                    TaxRegimeName = request.TaxRegimeName,
+                    CodePostal = request.CodePostal,
+                    UseCFDI = request.UseCFDI,
+                    UseCFDIName = request.UseCFDIName,
+                    Contact = request.Contact,
+                    CreateDate = request.CreateDate,
+                };
+                _unitOfWork.Invoice.Add(invoice);
+                await _unitOfWork.SaveChangeAsync();
+
+                var sale = await GetSales(new SaleFilter { Id = request.Sale });
+
+                _emailService.SendCFDI(invoice, sale.FirstOrDefault());
+
+                return invoice.Id;
+            }
+            catch(Exception ex) {
+
+                throw new BusinessException($"Ocurrió un error inesperado al intentar guardar factura\n{ex.Message}");
+            }
+        }
+        public async Task<bool> PostTryInvoice(InvoiceTryREQ request) {
+
+            try {
+
+                //invoice
+                var invoices = await GetInvoices(new InvoiceFilter { Id = request.Invoice });
+                if(invoices.Count() <= 0) throw new BusinessException("No se encontro factura");
+
+                var invoice = invoices.FirstOrDefault();
+                var invoiceMap = new TbInvoice {
+
+                    Id = invoice.Id,
+                    Sale = invoice.Sale,
+                    Name = invoice.Name,
+                    RFC = invoice.RFC,
+                    CodePostal = invoice.CodePostal,
+                    Contact = invoice.Contact,
+                    CreateDate = invoice.CreateDate,
+                    TaxRegime = invoice.TaxRegime,
+                    TaxRegimeName = invoice.TaxRegimeName,
+                    UseCFDI = invoice.UseCFDI,
+                    UseCFDIName = invoice.UseCFDIName
+                };
+
+                //sale
+                var sale = await GetSales(new SaleFilter { Id = request.Sale });
+                if(sale == null) throw new BusinessException("No se encontro venta");
+
+                _emailService.SendCFDI(invoiceMap, sale.FirstOrDefault());
+
+                return true;
+            }
+            catch(Exception ex) {
+
+                throw new BusinessException($"Ocurrió un error inesperado al intentar timbrar factura\n{ex.Message}");
+            }
+        }
 
 
         /*
@@ -1453,9 +1550,9 @@ namespace Kikis_back_refaccionaria.Infrastructure.Repositories {
         #endregion
 
         #region Supplier
-        /*
-         *  GET
-         */
+            /*
+             *  GET
+             */
         public async Task<IEnumerable<SupplierRES>> GetSupplier() {
 
             var supplier = await _unitOfWork.Supplier.GetAll();
