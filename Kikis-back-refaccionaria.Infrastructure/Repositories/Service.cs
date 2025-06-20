@@ -936,32 +936,41 @@ namespace Kikis_back_refaccionaria.Infrastructure.Repositories {
          *  GET
          */
         public async Task<IEnumerable<GenericCatalog>> GetProductCategory() {
-            var data = await _unitOfWork.ProductCategory.GetAll();
+            var data = _unitOfWork.ProductCategory
+                .GetQuery()
+                .Where(x => x.IsActive == true)
+                .AsNoTracking();
 
-            var response = data.Select(x => new GenericCatalog{
+            var response = await data.Select(x => new GenericCatalog{
                 Id = x.Id,
                 Name = x.Name,
                 Description = x.Description
-            }).ToList();
+            }).ToListAsync();
 
             return response;
         }
         
         public async Task<IEnumerable<GenericCatalog>> GetProductBrand() {
-            var data = await _unitOfWork.ProductBrand.GetAll();
+            var data = _unitOfWork.ProductBrand
+                .GetQuery()
+                .Where(x => x.IsActive == true)
+                .AsNoTracking();
 
-            var response = data.Select(x => new GenericCatalog {
+            var response = await data.Select(x => new GenericCatalog {
                 Id = x.Id,
                 Name = x.Name,
                 Description = x.Description
-            }).ToList();
+            }).ToListAsync();
 
             return response;
         }
 
         public async Task<IEnumerable<GenericCatalog>> GetProductHallway(){
 
-            var data = await _unitOfWork.ProductHallway.GetAll();
+            var data = _unitOfWork.ProductHallway
+                .GetQuery()
+                .Where(x => x.IsActive == true)
+                .AsNoTracking();
 
             var response = data.Select(x => new GenericCatalog {
                 Id = x.Id,
@@ -973,7 +982,10 @@ namespace Kikis_back_refaccionaria.Infrastructure.Repositories {
 
         public async Task<IEnumerable<GenericCatalog>> GetProductLevel(){
 
-            var data = await _unitOfWork.ProductLevel.GetAll();
+            var data = _unitOfWork.ProductLevel
+                .GetQuery()
+                .Where(x => x.IsActive == true)
+                .AsNoTracking();
 
             var response = data.Select(x => new GenericCatalog {
                 Id = x.Id,
@@ -985,7 +997,10 @@ namespace Kikis_back_refaccionaria.Infrastructure.Repositories {
 
         public async Task<IEnumerable<GenericCatalog>> GetProductShelf() {
 
-            var data = await _unitOfWork.ProductShelf.GetAll();
+            var data = _unitOfWork.ProductShelf
+                .GetQuery()
+                .Where(x => x.IsActive == true)
+                .AsNoTracking();
 
             var response = data.Select(x => new GenericCatalog {
                 Id = x.Id,
@@ -997,7 +1012,10 @@ namespace Kikis_back_refaccionaria.Infrastructure.Repositories {
 
         public async Task<IEnumerable<GenericCatalog>> GetProductKit() {
 
-            var data = await _unitOfWork.Kit.GetAll();
+            var data = _unitOfWork.Kit
+                .GetQuery()
+                .Where(x => x.IsActive == true)
+                .AsNoTracking();
 
             var response = data.Select(x => new GenericCatalog {
                 Id = x.Id,
@@ -1005,6 +1023,143 @@ namespace Kikis_back_refaccionaria.Infrastructure.Repositories {
             }).ToList();
 
             return response;
+        }
+
+
+        /*
+         *  DELETE
+         */
+        public async Task<bool> DeleteProductCategory(int id) {
+
+            var category = await _unitOfWork.ProductCategory
+                .GetQuery()
+                .Where(x => x.Id == id)
+                .Include(x => x.TbProducts)
+                .AsNoTracking()
+                .FirstOrDefaultAsync();
+
+            if(category == null)
+                throw new BusinessException("Categoria no encontrado");
+
+            if(category.TbProducts.Count > 0)
+                throw new BusinessException("La categoría no puede eliminarse ya que está siendo utilizada");
+
+            category.IsActive = false;
+
+            _unitOfWork.ProductCategory.Update(category);
+            await _unitOfWork.SaveChangeAsync();
+
+            return true;
+        }
+        public async Task<bool> DeleteProductBrand(int id) {
+
+            var brand = await _unitOfWork.ProductBrand
+                .GetQuery()
+                .Where(x => x.Id == id)
+                .Include(x => x.TbProducts)
+                .AsNoTracking()
+                .FirstOrDefaultAsync();
+
+            if(brand == null)
+                throw new BusinessException("Marca no encontrada");
+
+            if(brand.TbProducts.Count > 0)
+                throw new BusinessException("La marca no puede eliminarse ya que está siendo utilizada");
+
+            brand.IsActive = false;
+
+            _unitOfWork.ProductBrand.Update(brand);
+            await _unitOfWork.SaveChangeAsync();
+
+            return true;
+        }
+        public async Task<bool> DeleteProductHallway(int id) {
+
+            var hallway = await _unitOfWork.ProductHallway
+                .GetQuery()
+                .Where(x => x.Id == id)
+                .Include(x => x.TbProducts)
+                .AsNoTracking()
+                .FirstOrDefaultAsync();
+
+            if(hallway == null)
+                throw new BusinessException("Pasillo no encontrada");
+
+            if(hallway.TbProducts.Count > 0)
+                throw new BusinessException("El pasillo no puede eliminarse ya que está siendo utilizado");
+
+            hallway.IsActive = false;
+
+            _unitOfWork.ProductHallway.Update(hallway);
+            await _unitOfWork.SaveChangeAsync();
+
+            return true;
+        }
+        public async Task<bool> DeleteProductLevel(int id) {
+
+            var level = await _unitOfWork.ProductLevel
+                .GetQuery()
+                .Where(x => x.Id == id)
+                .Include(x => x.TbProducts)
+                .AsNoTracking()
+                .FirstOrDefaultAsync();
+
+            if(level == null)
+                throw new BusinessException("Nivel no encontrado");
+
+            if(level.TbProducts.Count > 0)
+                throw new BusinessException("El nivel no puede eliminarse ya que está siendo utilizado");
+
+            level.IsActive = false;
+
+            _unitOfWork.ProductLevel.Update(level);
+            await _unitOfWork.SaveChangeAsync();
+
+            return true;
+        }
+        public async Task<bool> DeleteProductShelf(int id) {
+
+            var shelf = await _unitOfWork.ProductShelf
+                .GetQuery()
+                .Where(x => x.Id == id)
+                .Include(x => x.TbProducts)
+                .AsNoTracking()
+                .FirstOrDefaultAsync();
+
+            if(shelf == null)
+                throw new BusinessException("Estante no encontrada");
+
+            if(shelf.TbProducts.Count > 0)
+                throw new BusinessException("El estante no puede eliminarse ya que está siendo utilizado");
+
+            shelf.IsActive = false;
+
+            _unitOfWork.ProductShelf.Update(shelf);
+            await _unitOfWork.SaveChangeAsync();
+
+            return true;
+        }
+        public async Task<bool> DeleteProductKit(int id) {
+
+            var kit = await _unitOfWork.Kit
+                .GetQuery()
+                .Where(x => x.Id == id)
+                .Include(x => x.TbProductKits)
+                .AsNoTracking()
+                .FirstOrDefaultAsync();
+
+            if(kit == null)
+                throw new BusinessException("Kit no encontrado");
+
+            if(kit.TbProductKits.Count > 0)
+                throw new BusinessException("El kit no puede eliminarse ya que está siendo utilizado");
+
+            kit.IsActive = false;
+
+            _unitOfWork.Kit.Update(kit);
+            await _unitOfWork.SaveChangeAsync();
+
+            return true;
         }
 
 

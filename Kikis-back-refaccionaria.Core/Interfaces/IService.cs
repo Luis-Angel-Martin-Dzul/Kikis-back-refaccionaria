@@ -107,6 +107,17 @@ namespace Kikis_back_refaccionaria.Core.Interfaces {
         Task<IEnumerable<GenericCatalog>> GetProductKit();
 
         /*
+         *  DELETE
+         */
+        Task<bool> DeleteProductCategory(int id);
+        Task<bool> DeleteProductBrand(int id);
+        Task<bool> DeleteProductHallway(int id);
+        Task<bool> DeleteProductLevel(int id);
+        Task<bool> DeleteProductShelf(int id);
+        Task<bool> DeleteProductKit(int id);
+
+
+        /*
          *  POST
          */
 

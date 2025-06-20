@@ -72,6 +72,52 @@ namespace Kikis_back_refaccionaria.Controllers {
 
 
         /*
+         *  DELETE
+         */
+        [HttpDelete("category/{id}")]
+        public async Task<IActionResult> DeleteProductCategory(int id) {
+
+            var data = await _service.DeleteProductCategory(id);
+            var response = new ApiResponse<bool>(data);
+            return Ok(response);
+        }
+        [HttpDelete("brand/{id}")]
+        public async Task<IActionResult> DeleteProductBrand(int id) {
+
+            var data = await _service.DeleteProductBrand(id);
+            var response = new ApiResponse<bool>(data);
+            return Ok(response);
+        }
+        [HttpDelete("hallway/{id}")]
+        public async Task<IActionResult> DeleteProductHallway(int id) {
+
+            var data = await _service.DeleteProductHallway(id);
+            var response = new ApiResponse<bool>(data);
+            return Ok(response);
+        }
+        [HttpDelete("level/{id}")]
+        public async Task<IActionResult> DeleteProductLevel(int id) {
+
+            var data = await _service.DeleteProductLevel(id);
+            var response = new ApiResponse<bool>(data);
+            return Ok(response);
+        }
+        [HttpDelete("shelf/{id}")]
+        public async Task<IActionResult> DeleteProductShelf(int id) {
+
+            var data = await _service.DeleteProductShelf(id);
+            var response = new ApiResponse<bool>(data);
+            return Ok(response);
+        }
+        [HttpDelete("kit/{id}")]
+        public async Task<IActionResult> DeleteProductKit(int id) {
+
+            var data = await _service.DeleteProductKit(id);
+            var response = new ApiResponse<bool>(data);
+            return Ok(response);
+        }
+
+        /*
          *  POST
          */
         [Route("category/")]

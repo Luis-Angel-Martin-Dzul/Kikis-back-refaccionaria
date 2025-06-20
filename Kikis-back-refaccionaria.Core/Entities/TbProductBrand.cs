@@ -14,6 +14,8 @@ namespace Kikis_back_refaccionaria.Core.Entities {
         [StringLength(255)]
         public string? Description { get; set; }
 
+        public bool IsActive { get; set; }
+
         [InverseProperty("BrandNavigation")]
         public virtual ICollection<TbProduct> TbProducts { get; set; } = new List<TbProduct>();
     }
