@@ -3,6 +3,7 @@
 namespace Kikis_back_refaccionaria.Core.Interfaces {
     public interface IUnitOfWork : IDisposable {
 
+        IRepository<TbClient> Client { get; }
         IRepository<TbDeliveryDetail> DeliveryDetail { get; }
         IRepository<TbInvoice> Invoice { get; }
         IRepository<TbKit> Kit { get; }

@@ -7,6 +7,8 @@ namespace Kikis_back_refaccionaria.Infrastructure.Data {
 
         public KikisDbContext(DbContextOptions<KikisDbContext> options) : base(options) {}
 
+        public virtual DbSet<TbClient> TbClients { get; set; }
+
         public virtual DbSet<TbDeliveryDetail> TbDeliveryDetails { get; set; }
 
         public virtual DbSet<TbDeliveryDetailsStatus> TbDeliveryDetailsStatuses { get; set; }
@@ -55,6 +57,13 @@ namespace Kikis_back_refaccionaria.Infrastructure.Data {
             modelBuilder
                 .UseCollation("utf8mb4_0900_ai_ci")
                 .HasCharSet("utf8mb4");
+
+            modelBuilder.Entity<TbClient>(entity =>
+            {
+                entity.HasKey(e => e.Id).HasName("PRIMARY");
+
+                entity.Property(e => e.Id).ValueGeneratedNever();
+            });
 
             modelBuilder.Entity<TbDeliveryDetail>(entity =>
             {

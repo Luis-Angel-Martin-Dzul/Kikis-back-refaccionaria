@@ -9,6 +9,7 @@ namespace Kikis_back_refaccionaria.Infrastructure.Repositories {
         private readonly KikisDbContext _context;
         private IDbContextTransaction _transaction;
 
+        private readonly IRepository<TbClient> _client;
         private readonly IRepository<TbDeliveryDetail> _deliveryDetail;
         private readonly IRepository<TbInvoice> _invoice;
         private readonly IRepository<TbKit> _kit;
@@ -33,6 +34,7 @@ namespace Kikis_back_refaccionaria.Infrastructure.Repositories {
             _context = context;
         }
 
+        public IRepository<TbClient> Client => _client ?? new Repository<TbClient>(_context);
         public IRepository<TbDeliveryDetail> DeliveryDetail => _deliveryDetail ?? new Repository<TbDeliveryDetail>(_context);
         public IRepository<TbInvoice> Invoice => _invoice ?? new Repository<TbInvoice>(_context);
         public IRepository<TbKit> Kit => _kit ?? new Repository<TbKit>(_context);
