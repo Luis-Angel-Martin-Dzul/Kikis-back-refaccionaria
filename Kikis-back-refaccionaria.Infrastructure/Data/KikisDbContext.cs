@@ -61,8 +61,6 @@ namespace Kikis_back_refaccionaria.Infrastructure.Data {
             modelBuilder.Entity<TbClient>(entity =>
             {
                 entity.HasKey(e => e.Id).HasName("PRIMARY");
-
-                entity.Property(e => e.Id).ValueGeneratedNever();
             });
 
             modelBuilder.Entity<TbDeliveryDetail>(entity =>
