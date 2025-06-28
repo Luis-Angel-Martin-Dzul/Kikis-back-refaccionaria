@@ -1,5 +1,6 @@
 ﻿using Kikis_back_refaccionaria.Core.Entities;
 using Kikis_back_refaccionaria.Core.Interfaces;
+using Kikis_back_refaccionaria.Core.Request;
 using Kikis_back_refaccionaria.Core.Responses;
 using Kikis_back_refaccionaria.Core.Settings;
 using Microsoft.Extensions.Options;
@@ -169,6 +170,138 @@ namespace Kikis_back_refaccionaria.Infrastructure.Repositories {
             }
             catch(Exception ex) {
                 throw new Exception("Error al enviar el correo: " + ex.Message);
+            }
+
+            return true;
+        }
+
+        public bool SendQuote(SaleREQ sale) {
+            try {
+                // Datos del cliente
+                string clienteNombre = $"{sale.Client.FirstName} {sale.Client.LastName}";
+                string clienteEmail = sale.Client.Email;
+                string clienteTelefono = sale.Client.Cellphone;
+                string clienteDireccion = sale.Client.Address;
+
+                // Datos del emisor (estáticos o configurables)
+                string empresa_emisora = "KIKIS REFACCIONARIA";
+                string empresa_emisora_rfc = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+                string direccion_emisor = "Calle Ficticia 123, COD_POSTAL MERIDA, YUCATAN, MEXICO";
+
+                // Fecha y número de cotización
+                string fecha = sale.CreateDate.ToString("yyyy-MM-dd");
+                string cotizacionFolio = $"COT-{DateTime.Now:yyyyMMddHHmmss}";
+
+                // Productos
+                string productosHtml = "";
+                foreach(var product in sale.SaleDetails) {
+                    productosHtml += $@"
+                    <tr>
+                        <td>{product.Quantity}</td>
+                        <td>{product.Name}</td>
+                        <td>${product.PriceUnit:N2}</td>
+                        <td>${product.Total:N2}</td>
+                    </tr>";
+                }
+
+                // Totales
+                string venta_subtotal = sale.SubTotal.ToString("N2");
+                string venta_iva = sale.Iva.ToString("N2");
+                string venta_total = sale.Total.ToString("N2");
+
+                // HTML del correo
+                string htmlBody = $@"
+                <!DOCTYPE html>
+                <html lang='es'>
+                <head>
+                  <meta charset='UTF-8'>
+                  <title>Cotización</title>
+                  <style>
+                    body {{ font-family: Arial, sans-serif; margin: 40px; color: #333; }}
+                    .cotizacion {{ border: 1px solid #ccc; padding: 20px; }}
+                    .header, .footer {{ background-color: #f2f2f2; padding: 10px; }}
+                    .titulo {{ text-align: center; font-size: 24px; margin-bottom: 20px; }}
+                    .datos-emisor, .datos-receptor {{ margin-bottom: 20px; }}
+                    .datos-emisor h3, .datos-receptor h3 {{ margin-bottom: 5px; }}
+                    table {{ width: 100%; border-collapse: collapse; margin-top: 10px; }}
+                    table, th, td {{ border: 1px solid #999; }}
+                    th, td {{ padding: 8px; text-align: left; }}
+                    .totales {{ margin-top: 20px; text-align: right; }}
+                    .totales div {{ margin: 5px 0; }}
+                  </style>
+                </head>
+                <body>
+                  <div class='cotizacion'>
+                    <div class='header'>
+                      <strong>Cotización No:</strong> {cotizacionFolio} | <strong>Fecha:</strong> {fecha}
+                    </div>
+
+                    <div class='titulo'>Cotización</div>
+
+                    <div class='datos-emisor'>
+                      <h3>Emisor:</h3>
+                      <p>{empresa_emisora}<br>
+                      RFC: {empresa_emisora_rfc}<br>
+                      Dirección: {direccion_emisor}</p>
+                    </div>
+
+                    <div class='datos-receptor'>
+                      <h3>Cliente:</h3>
+                      <p>{clienteNombre}<br>
+                      Correo: {clienteEmail}<br>
+                      Teléfono: {clienteTelefono}<br>
+                      Dirección: {clienteDireccion}</p>
+                    </div>
+
+                    <table>
+                      <thead>
+                        <tr>
+                          <th>Cantidad</th>
+                          <th>Descripción</th>
+                          <th>Precio Unitario</th>
+                          <th>Importe</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {productosHtml}
+                      </tbody>
+                    </table>
+
+                    <div class='totales'>
+                      <div><strong>Subtotal:</strong> ${venta_subtotal}</div>
+                      <div><strong>IVA (16%):</strong> ${venta_iva}</div>
+                      <div><strong>Total:</strong> ${venta_total}</div>
+                    </div>
+
+                    <div class='footer'>
+                      <p>Gracias por su preferencia. Esta es una cotización informativa, no representa una factura.</p>
+                    </div>
+                  </div>
+                </body>
+                </html>";
+
+                // Envío de correo
+                var mailMessage = new MailMessage(
+                    _emailSettings.FromEmail,
+                    clienteEmail,
+                    "Cotización | Refaccionaria Kikis",
+                    htmlBody
+                ) {
+                    IsBodyHtml = true
+                };
+
+                var client = new SmtpClient(_emailSettings.SmtpClient) {
+                    EnableSsl = true,
+                    UseDefaultCredentials = false,
+                    Port = _emailSettings.Port,
+                    Credentials = new NetworkCredential(_emailSettings.FromEmail, _emailSettings.Password)
+                };
+
+                client.Send(mailMessage);
+                client.Dispose();
+            }
+            catch(Exception ex) {
+                throw new Exception("Error al enviar la cotización: " + ex.Message);
             }
 
             return true;

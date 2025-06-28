@@ -3,6 +3,8 @@
 namespace Kikis_back_refaccionaria.Core.Request {
     public class SaleREQ {
 
+        public ClientREQ? Client { get; set; }
+
         public GenericCatalog Seller { get; set; }
 
         public decimal SubTotal { get; set; }

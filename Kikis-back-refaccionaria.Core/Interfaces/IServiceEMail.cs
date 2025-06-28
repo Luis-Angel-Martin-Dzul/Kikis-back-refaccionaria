@@ -7,5 +7,6 @@ namespace Kikis_back_refaccionaria.Core.Interfaces {
 
         bool SendUserPasswordEmail(string to, string password);
         bool SendCFDI(TbInvoice invoice, SaleRES product);
+        bool SendQuote(SaleREQ quote);
     }
 }

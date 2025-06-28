@@ -57,6 +57,14 @@ namespace Kikis_back_refaccionaria.Controllers {
             var response = new ApiResponse<bool>(data);
             return Ok(response);
         }
+        [Route("quote/")]
+        [HttpPost]
+        public async Task<IActionResult> PostSalesQuote(SaleREQ request) {
+
+            var data = await _service.PostQuote(request);
+            var response = new ApiResponse<bool>(data);
+            return Ok(response);
+        }
         [Route("invoice/")]
         [HttpPost]
         public async Task<IActionResult> PostInvoice(InvoiceREQ request) {

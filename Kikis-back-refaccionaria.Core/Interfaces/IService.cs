@@ -184,6 +184,7 @@ namespace Kikis_back_refaccionaria.Core.Interfaces {
         Task<bool> PostSales(SaleREQ request);
         Task<int> PostInvoice(InvoiceREQ request);
         Task<bool> PostTryInvoice(InvoiceTryREQ request);
+        Task<bool> PostQuote(SaleREQ request);
 
 
         /*

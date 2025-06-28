@@ -8,6 +8,7 @@ using Kikis_back_refaccionaria.Core.Responses;
 using Kikis_back_refaccionaria.Infrastructure.Encryption;
 using Kikis_back_refaccionaria.Infrastructure.Utilities;
 using Microsoft.EntityFrameworkCore;
+using System.Linq;
 
 namespace Kikis_back_refaccionaria.Infrastructure.Repositories {
     public class Service : IService {
@@ -37,6 +38,14 @@ namespace Kikis_back_refaccionaria.Infrastructure.Repositories {
             //filter
             if(filter.Id != null)
                 query = query.Where(x => x.Id == filter.Id);
+
+            if(!string.IsNullOrWhiteSpace(filter.Name)) {
+                var nameToSearch = filter.Name.Trim().ToLower();
+
+                query = query.Where(x =>
+                    (x.FirstName + " " + x.LastName).ToLower().Contains(nameToSearch) ||
+                    (x.LastName + " " + x.FirstName).ToLower().Contains(nameToSearch));
+            }
 
             var clients = await query.ToListAsync();
 
@@ -1824,7 +1833,17 @@ namespace Kikis_back_refaccionaria.Infrastructure.Repositories {
                 throw new BusinessException($"Ocurrió un error inesperado al intentar timbrar factura\n{ex.Message}");
             }
         }
+        public async Task<bool> PostQuote(SaleREQ request) {
+            try {
 
+                return _emailService.SendQuote(request);
+
+            }
+            catch(Exception ex) {
+
+                throw new BusinessException($"Ocurrió un error inesperado al intentar enviar cotizacion\n{ex.Message}");
+            }
+        }
 
         /*
          *  PUT
@@ -1832,9 +1851,9 @@ namespace Kikis_back_refaccionaria.Infrastructure.Repositories {
         #endregion
 
         #region Supplier
-            /*
-             *  GET
-             */
+        /*
+         *  GET
+         */
         public async Task<IEnumerable<SupplierRES>> GetSupplier() {
 
             var supplier = await _unitOfWork.Supplier.GetAll();
