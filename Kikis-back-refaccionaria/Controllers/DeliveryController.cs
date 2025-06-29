@@ -9,8 +9,8 @@ namespace Kikis_back_refaccionaria.Controllers {
     [ApiController]
     public class DeliveryController : ControllerBase {
 
-        private readonly IService _service;
-        public DeliveryController(IService service) {
+        private readonly IServiceDelivery _service;
+        public DeliveryController(IServiceDelivery service) {
             _service = service;
         }
 

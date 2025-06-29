@@ -7,8 +7,8 @@ namespace Kikis_back_refaccionaria.Controllers {
     [ApiController]
     public class SupplierController : ControllerBase {
 
-        private readonly IService _service;
-        public SupplierController(IService service) {
+        private readonly IServiceSupplier _service;
+        public SupplierController(IServiceSupplier service) {
             _service = service;
         }
 

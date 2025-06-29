@@ -36,7 +36,13 @@ builder.Services.AddTransient<IServiceEMail, ServiceEMail>();
 
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
-builder.Services.AddTransient<IService, Service>();
+builder.Services.AddTransient<IServiceCatalogs, ServiceCatalogs>();
+builder.Services.AddTransient<IServiceClient, ServiceClient>();
+builder.Services.AddTransient<IServiceDelivery, ServiceDelivery>();
+builder.Services.AddTransient<IServiceProduct, ServiceProduct>();
+builder.Services.AddTransient<IServiceSale, ServiceSale>();
+builder.Services.AddTransient<IServiceSupplier, ServiceSupplier>();
+builder.Services.AddTransient<IServiceUser, ServiceUser>();
 
 // Cors
 builder.Services.AddCors(options => {

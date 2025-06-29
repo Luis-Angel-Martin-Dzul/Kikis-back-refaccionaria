@@ -9,8 +9,8 @@ namespace Kikis_back_refaccionaria.Controllers {
     [ApiController]
     public class SaleController : ControllerBase {
 
-        private readonly IService _service;
-        public SaleController(IService service) {
+        private readonly IServiceSale _service;
+        public SaleController(IServiceSale service) {
             _service = service;
         }
 

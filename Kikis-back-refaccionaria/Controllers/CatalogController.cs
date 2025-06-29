@@ -8,8 +8,8 @@ namespace Kikis_back_refaccionaria.Controllers {
     [ApiController]
     public class CatalogController : ControllerBase {
 
-        private readonly IService _service;
-        public CatalogController(IService service) {
+        private readonly IServiceCatalogs _service;
+        public CatalogController(IServiceCatalogs service) {
             _service = service;
         }
 
