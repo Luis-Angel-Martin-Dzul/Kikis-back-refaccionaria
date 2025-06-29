@@ -21,7 +21,7 @@ namespace Kikis_back_refaccionaria.Controllers {
         [HttpGet]
         public async Task<IActionResult> GetProducts([FromQuery] ProductFilter filter) {
 
-            var data = await _service.GetProducts(filter);
+            var data = await _service.GetProducts(filter, getHostURL());
             var response = new ApiResponse<IEnumerable<ProductRES>>(data);
             return Ok(response);
         }
@@ -45,7 +45,7 @@ namespace Kikis_back_refaccionaria.Controllers {
         [HttpPost]
         public async Task<IActionResult> PostProduct([FromBody] ProductREQ request) {
 
-            var data = await _service.PostProduct(request);
+            var data = await _service.PostProduct(request, getHostURL());
             var response = new ApiResponse<ProductRES>(data);
             return Ok(response);
         }
@@ -95,5 +95,9 @@ namespace Kikis_back_refaccionaria.Controllers {
             return Ok(response);
         }
 
+
+        private string getHostURL() {
+            return $"{HttpContext.Request.Scheme}://{HttpContext.Request.Host}/";
+        }
     }
 }

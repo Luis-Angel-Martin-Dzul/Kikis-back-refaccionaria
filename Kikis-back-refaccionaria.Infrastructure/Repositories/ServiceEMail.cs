@@ -197,9 +197,9 @@ namespace Kikis_back_refaccionaria.Infrastructure.Repositories {
                 foreach(var product in sale.SaleDetails) {
                     productosHtml += $@"
                     <tr>
-                        <td>{product.Quantity}</td>
                         <td>{product.Name}</td>
                         <td>${product.PriceUnit:N2}</td>
+                        <td>{product.Quantity}</td>
                         <td>${product.Total:N2}</td>
                     </tr>";
                 }

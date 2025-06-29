@@ -8,7 +8,7 @@ namespace Kikis_back_refaccionaria.Core.Interfaces {
         /*
          *  GET
          */
-        Task<IEnumerable<ProductRES>> GetProducts(ProductFilter filter);
+        Task<IEnumerable<ProductRES>> GetProducts(ProductFilter filter, string schema);
 
 
         /*
@@ -20,7 +20,7 @@ namespace Kikis_back_refaccionaria.Core.Interfaces {
         /*
          *  POST
          */
-        Task<ProductRES> PostProduct(ProductREQ request);
+        Task<ProductRES> PostProduct(ProductREQ request, string schema);
 
 
         /*

@@ -21,7 +21,7 @@ namespace Kikis_back_refaccionaria.Infrastructure.Repositories {
         /*
          *  GET
          */
-        public async Task<IEnumerable<ProductRES>> GetProducts(ProductFilter filter) {
+        public async Task<IEnumerable<ProductRES>> GetProducts(ProductFilter filter, string schema) {
 
             //query
             var query = _unitOfWork.Product
@@ -72,11 +72,9 @@ namespace Kikis_back_refaccionaria.Infrastructure.Repositories {
                 Quantity = x.Quantity,
                 Price = x.Price,
                 Discount = x.Discount,
-                Path = Constants.HOST + x.Path,
+                Path = schema + x.Path,
                 IsActive = x.IsActive
             }).ToListAsync();
-
-
 
             return products;
         }
@@ -111,7 +109,7 @@ namespace Kikis_back_refaccionaria.Infrastructure.Repositories {
         /*
          *  POST
          */
-        public async Task<ProductRES> PostProduct(ProductREQ request) {
+        public async Task<ProductRES> PostProduct(ProductREQ request, string schema) {
 
             try {
 
@@ -122,7 +120,7 @@ namespace Kikis_back_refaccionaria.Infrastructure.Repositories {
                 _unitOfWork.Product.Add(product);
                 await _unitOfWork.SaveChangeAsync();
 
-                var lastInsert = await GetProducts(new ProductFilter { Id = product.Id });
+                var lastInsert = await GetProducts(new ProductFilter { Id = product.Id }, schema);
                 var productRES = lastInsert.FirstOrDefault();
 
 
