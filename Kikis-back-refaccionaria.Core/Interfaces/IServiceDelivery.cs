@@ -8,8 +8,8 @@ namespace Kikis_back_refaccionaria.Core.Interfaces {
         /*
          *  GET
          */
-        Task<IEnumerable<DeliveryDetailRES>> GetDeliveryDetails(DeliveryDetailsFilter filter);
-        Task<IEnumerable<TrackRES>> GetTracks(TrackFilter filter);
+        Task<PagedResponse<DeliveryDetailRES>> GetDeliveryDetails(DeliveryDetailsFilter filter);
+        Task<PagedResponse<TrackRES>> GetTracks(TrackFilter filter);
 
 
         /*

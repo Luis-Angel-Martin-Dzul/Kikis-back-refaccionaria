@@ -17,7 +17,7 @@ namespace Kikis_back_refaccionaria.Infrastructure.Repositories {
         /*
          *  GET
          */
-        public async Task<IEnumerable<DeliveryDetailRES>> GetDeliveryDetails(DeliveryDetailsFilter filter) {
+        public async Task<PagedResponse<DeliveryDetailRES>> GetDeliveryDetails(DeliveryDetailsFilter filter) {
 
             //query
             var query = _unitOfWork.DeliveryDetail
@@ -31,26 +31,38 @@ namespace Kikis_back_refaccionaria.Infrastructure.Repositories {
             if(filter.Status != null)
                 query = query.Where(x => x.Status == filter.Status);
 
+            int totalItems = await query.CountAsync();
+
             //select
-            var response = await query.Select(x => new DeliveryDetailRES {
-                Id = x.Id,
-                Sale = x.Sale,
-                Responsible = x.Responsible,
-                Address = x.Address,
-                Latitude = x.Latitude,
-                Longitude = x.Longitude,
-                Status = new GenericCatalog {
-                    Id = x.StatusNavigation.Id,
-                    Name = x.StatusNavigation.Name,
-                },
-                Comments = x.Comments,
-                CreateDate = x.CreateDate,
+            var deliveryDetails = await query
+                .OrderBy(x => x.Id)
+                .Skip((filter.PageNumber - 1) * filter.PageSize)
+                .Take(filter.PageSize)
+                .Select(x => new DeliveryDetailRES {
+                    Id = x.Id,
+                    Sale = x.Sale,
+                    Responsible = x.Responsible,
+                    Address = x.Address,
+                    Latitude = x.Latitude,
+                    Longitude = x.Longitude,
+                    Status = new GenericCatalog {
+                        Id = x.StatusNavigation.Id,
+                        Name = x.StatusNavigation.Name,
+                    },
+                    Comments = x.Comments,
+                    CreateDate = x.CreateDate,
             }).ToListAsync();
 
-            return response;
+            //response
+            return new PagedResponse<DeliveryDetailRES> {
+                Items = deliveryDetails,
+                TotalItems = totalItems,
+                PageNumber = filter.PageNumber,
+                PageSize = filter.PageSize
+            };
         }
 
-        public async Task<IEnumerable<TrackRES>> GetTracks(TrackFilter filter) {
+        public async Task<PagedResponse<TrackRES>> GetTracks(TrackFilter filter) {
 
             //query
             var query = _unitOfWork.Track
@@ -65,45 +77,55 @@ namespace Kikis_back_refaccionaria.Infrastructure.Repositories {
             //filter
             if(filter.Id != null)
                 query = query.Where(x => x.Id == filter.Id);
-
             query = query.Where(x => x.IsActive == true);
 
-            //select
-            var response = await query.Select(x => new TrackRES {
-                Id = x.Id,
-                Name = x.Name,
-                User = new UserREQ {
-                    Id = x.UserNavigation.Id,
-                    FirstName = x.UserNavigation.FirstName,
-                    LastName = x.UserNavigation.LastName,
-                    Email = x.UserNavigation.Email,
-                    Curp = x.UserNavigation.Curp,
-                    CreateDate = x.UserNavigation.CreateDate,
-                },
-                CreateDate = x.CreateDate,
-                Status = new GenericCatalog {
-                    Id = x.StatusNavigation.Id,
-                    Name = x.StatusNavigation.Name,
-                },
-                Deliveries = x.TbTrackDeliveries.Select(td => new DeliveryDetailRES {
-                    Id = td.DeliveryNavigation.Id,
-                    Sale = td.DeliveryNavigation.Sale,
-                    Responsible = td.DeliveryNavigation.Responsible,
-                    Address = td.DeliveryNavigation.Address,
-                    Latitude = td.DeliveryNavigation.Latitude,
-                    Longitude = td.DeliveryNavigation.Longitude,
-                    Comments = td.DeliveryNavigation.Comments ?? "",
-                    CreateDate = td.DeliveryNavigation.CreateDate,
-                    Status = new GenericCatalog {
-                        Id = td.DeliveryNavigation.StatusNavigation.Id,
-                        Name = td.DeliveryNavigation.StatusNavigation.Name
-                    }
-                }).ToList(),
-                IsActive = x.IsActive
+            int totalItems = await query.CountAsync();
 
+            //select
+            var tracks = await query
+                .OrderBy(x => x.Id)
+                .Skip((filter.PageNumber - 1) * filter.PageSize)
+                .Take(filter.PageSize)
+                .Select(x => new TrackRES {
+                    Id = x.Id,
+                    Name = x.Name,
+                    User = new UserREQ {
+                        Id = x.UserNavigation.Id,
+                        FirstName = x.UserNavigation.FirstName,
+                        LastName = x.UserNavigation.LastName,
+                        Email = x.UserNavigation.Email,
+                        Curp = x.UserNavigation.Curp,
+                        CreateDate = x.UserNavigation.CreateDate,
+                    },
+                    CreateDate = x.CreateDate,
+                    Status = new GenericCatalog {
+                        Id = x.StatusNavigation.Id,
+                        Name = x.StatusNavigation.Name,
+                    },
+                    Deliveries = x.TbTrackDeliveries.Select(td => new DeliveryDetailRES {
+                        Id = td.DeliveryNavigation.Id,
+                        Sale = td.DeliveryNavigation.Sale,
+                        Responsible = td.DeliveryNavigation.Responsible,
+                        Address = td.DeliveryNavigation.Address,
+                        Latitude = td.DeliveryNavigation.Latitude,
+                        Longitude = td.DeliveryNavigation.Longitude,
+                        Comments = td.DeliveryNavigation.Comments ?? "",
+                        CreateDate = td.DeliveryNavigation.CreateDate,
+                        Status = new GenericCatalog {
+                            Id = td.DeliveryNavigation.StatusNavigation.Id,
+                            Name = td.DeliveryNavigation.StatusNavigation.Name
+                        }
+                    }).ToList(),
+                    IsActive = x.IsActive
             }).ToListAsync();
 
-            return response;
+            //response
+            return new PagedResponse<TrackRES> {
+                Items = tracks,
+                TotalItems = totalItems,
+                PageNumber = filter.PageNumber,
+                PageSize = filter.PageSize
+            };
         }
 
 
@@ -184,7 +206,7 @@ namespace Kikis_back_refaccionaria.Infrastructure.Repositories {
 
                 //response
                 var lastInsert = await GetTracks(new TrackFilter { Id = track.Id });
-                var response = lastInsert.FirstOrDefault();
+                var response = lastInsert.Items.FirstOrDefault();
 
                 await _unitOfWork.CommitTransactionAsync();
                 return response;
@@ -213,7 +235,7 @@ namespace Kikis_back_refaccionaria.Infrastructure.Repositories {
                 await _unitOfWork.SaveChangeAsync();
 
                 var lastInsert = await GetDeliveryDetails(new DeliveryDetailsFilter { Id = delivery.Id });
-                var response = lastInsert.FirstOrDefault();
+                var response = lastInsert.Items.FirstOrDefault();
 
                 return response;
             }
@@ -292,7 +314,7 @@ namespace Kikis_back_refaccionaria.Infrastructure.Repositories {
 
 
                 var lastInsert = await GetTracks(new TrackFilter { Id = track.Id });
-                var response = lastInsert.FirstOrDefault();
+                var response = lastInsert.Items.FirstOrDefault();
 
                 await _unitOfWork.CommitTransactionAsync();
 
@@ -322,7 +344,7 @@ namespace Kikis_back_refaccionaria.Infrastructure.Repositories {
                 await _unitOfWork.SaveChangeAsync();
 
                 var lastInsert = await GetDeliveryDetails(new DeliveryDetailsFilter { Id = delivery.Id });
-                var response = lastInsert.FirstOrDefault();
+                var response = lastInsert.Items.FirstOrDefault();
 
                 return response;
             }

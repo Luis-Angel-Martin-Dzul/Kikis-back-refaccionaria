@@ -22,7 +22,7 @@ namespace Kikis_back_refaccionaria.Controllers {
         public async Task<IActionResult> GetTracks([FromQuery] TrackFilter filter) {
 
             var data = await _service.GetTracks(filter);
-            var response = new ApiResponse<IEnumerable<TrackRES>>(data);
+            var response = new ApiResponse<PagedResponse<TrackRES>>(data);
             return Ok(response);
         }
         [Route("details/")]
@@ -30,7 +30,7 @@ namespace Kikis_back_refaccionaria.Controllers {
         public async Task<IActionResult> GetDeliveryDetails([FromQuery] DeliveryDetailsFilter filter) {
 
             var data = await _service.GetDeliveryDetails(filter);
-            var response = new ApiResponse<IEnumerable<DeliveryDetailRES>>(data);
+            var response = new ApiResponse<PagedResponse<DeliveryDetailRES>>(data);
             return Ok(response);
         }
 
