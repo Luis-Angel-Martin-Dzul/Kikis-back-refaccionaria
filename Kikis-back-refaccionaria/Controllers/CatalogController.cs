@@ -1,4 +1,5 @@
-﻿using Kikis_back_refaccionaria.Core.Interfaces;
+﻿using Kikis_back_refaccionaria.Core.Filters;
+using Kikis_back_refaccionaria.Core.Interfaces;
 using Kikis_back_refaccionaria.Core.Request;
 using Kikis_back_refaccionaria.Core.Responses;
 using Microsoft.AspNetCore.Mvc;
@@ -18,55 +19,55 @@ namespace Kikis_back_refaccionaria.Controllers {
          */
         [Route("category/")]
         [HttpGet]
-        public async Task<IActionResult> GetProductCategory() {
+        public async Task<IActionResult> GetProductCategory([FromQuery] PaginationFilter filter) {
 
-            var data = await _service.GetProductCategory();
-            var response = new ApiResponse<IEnumerable<GenericCatalog>>(data);
+            var data = await _service.GetProductCategory(filter);
+            var response = new ApiResponse<PagedResponse<GenericCatalog>>(data);
             return Ok(response);
         }
 
         [Route("brand/")]
         [HttpGet]
-        public async Task<IActionResult> GetProductBrand() {
+        public async Task<IActionResult> GetProductBrand([FromQuery] PaginationFilter filter) {
 
-            var data = await _service.GetProductBrand();
-            var response = new ApiResponse<IEnumerable<GenericCatalog>>(data);
+            var data = await _service.GetProductBrand(filter);
+            var response = new ApiResponse<PagedResponse<GenericCatalog>>(data);
             return Ok(response);
         }
 
         [Route("hallway/")]
         [HttpGet]
-        public async Task<IActionResult> GetProductHallway() {
+        public async Task<IActionResult> GetProductHallway([FromQuery] PaginationFilter filter) {
 
-            var data = await _service.GetProductHallway();
-            var response = new ApiResponse<IEnumerable<GenericCatalog>>(data);
+            var data = await _service.GetProductHallway(filter);
+            var response = new ApiResponse<PagedResponse<GenericCatalog>>(data);
             return Ok(response);
         }
 
         [Route("level/")]
         [HttpGet]
-        public async Task<IActionResult> GetProductLevel() {
+        public async Task<IActionResult> GetProductLevel([FromQuery] PaginationFilter filter) {
 
-            var data = await _service.GetProductLevel();
-            var response = new ApiResponse<IEnumerable<GenericCatalog>>(data);
+            var data = await _service.GetProductLevel(filter);
+            var response = new ApiResponse<PagedResponse<GenericCatalog>>(data);
             return Ok(response);
         }
 
         [Route("shelf/")]
         [HttpGet]
-        public async Task<IActionResult> GetProductShelf() {
+        public async Task<IActionResult> GetProductShelf([FromQuery] PaginationFilter filter) {
 
-            var data = await _service.GetProductShelf();
-            var response = new ApiResponse<IEnumerable<GenericCatalog>>(data);
+            var data = await _service.GetProductShelf(filter);
+            var response = new ApiResponse<PagedResponse<GenericCatalog>>(data);
             return Ok(response);
         }
 
         [Route("kit/")]
         [HttpGet]
-        public async Task<IActionResult> GetProductKit() {
+        public async Task<IActionResult> GetProductKit([FromQuery] PaginationFilter filter) {
 
-            var data = await _service.GetProductKit();
-            var response = new ApiResponse<IEnumerable<GenericCatalog>>(data);
+            var data = await _service.GetProductKit(filter);
+            var response = new ApiResponse<PagedResponse<GenericCatalog>>(data);
             return Ok(response);
         }
 

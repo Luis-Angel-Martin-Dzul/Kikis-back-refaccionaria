@@ -7,6 +7,7 @@ using Kikis_back_refaccionaria.Core.Request;
 using Kikis_back_refaccionaria.Core.Responses;
 using Kikis_back_refaccionaria.Infrastructure.Utilities;
 using Microsoft.EntityFrameworkCore;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Kikis_back_refaccionaria.Infrastructure.Repositories {
     public class ServiceProduct : IServiceProduct {
@@ -21,7 +22,7 @@ namespace Kikis_back_refaccionaria.Infrastructure.Repositories {
         /*
          *  GET
          */
-        public async Task<IEnumerable<ProductRES>> GetProducts(ProductFilter filter, string schema) {
+        public async Task<PagedResponse<ProductRES>> GetProducts(ProductFilter filter, string schema) {
 
             //query
             var query = _unitOfWork.Product
@@ -42,41 +43,53 @@ namespace Kikis_back_refaccionaria.Infrastructure.Repositories {
             if(filter.Id != null)
                 query = query.Where(x => x.Id == filter.Id);
 
+            int totalItems = await query.CountAsync();
+
             //select
-            var products = await query.Select(x => new ProductRES {
-                Id = x.Id,
-                Name = x.Name,
-                Barcode = x.Barcode,
-                Brand = x.BrandNavigation.Name,
-                Category = x.CategoryNavigation.Name,
-                Hallway = new GenericCatalog {
-                    Id = x.HallwayNavigation.Id,
-                    Name = x.HallwayNavigation.Name,
-                },
-                Level = new GenericCatalog {
-                    Id = x.LevelNavigation.Id,
-                    Name = x.LevelNavigation.Name,
-                },
-                Shelf = new GenericCatalog {
-                    Id = x.ShelfNavigation.Id,
-                    Name = x.ShelfNavigation.Name,
-                },
-                Suppliers = x.TbProductSuppliers.Select(x => new SupplierRES {
-                    Id = x.SupplierNavigation.Id,
-                    BusinessName = x.SupplierNavigation.BusinessName,
-                }).ToList(),
-                Kits = x.TbProductKits.Select(x => new GenericCatalog {
-                    Id = x.KitNavigation.Id,
-                    Name = x.KitNavigation.Name,
-                }).ToList(),
-                Quantity = x.Quantity,
-                Price = x.Price,
-                Discount = x.Discount,
-                Path = schema + x.Path,
-                IsActive = x.IsActive
+            var products = await query
+                .OrderBy(x => x.Id)
+                .Skip((filter.PageNumber - 1) * filter.PageSize)
+                .Take(filter.PageSize)
+                .Select(x => new ProductRES {
+                    Id = x.Id,
+                    Name = x.Name,
+                    Barcode = x.Barcode,
+                    Brand = x.BrandNavigation.Name,
+                    Category = x.CategoryNavigation.Name,
+                    Hallway = new GenericCatalog {
+                        Id = x.HallwayNavigation.Id,
+                        Name = x.HallwayNavigation.Name,
+                    },
+                    Level = new GenericCatalog {
+                        Id = x.LevelNavigation.Id,
+                        Name = x.LevelNavigation.Name,
+                    },
+                    Shelf = new GenericCatalog {
+                        Id = x.ShelfNavigation.Id,
+                        Name = x.ShelfNavigation.Name,
+                    },
+                    Suppliers = x.TbProductSuppliers.Select(x => new SupplierRES {
+                        Id = x.SupplierNavigation.Id,
+                        BusinessName = x.SupplierNavigation.BusinessName,
+                    }).ToList(),
+                    Kits = x.TbProductKits.Select(x => new GenericCatalog {
+                        Id = x.KitNavigation.Id,
+                        Name = x.KitNavigation.Name,
+                    }).ToList(),
+                    Quantity = x.Quantity,
+                    Price = x.Price,
+                    Discount = x.Discount,
+                    Path = schema + x.Path,
+                    IsActive = x.IsActive
             }).ToListAsync();
 
-            return products;
+            //response
+            return new PagedResponse<ProductRES> {
+                Items = products,
+                TotalItems = totalItems,
+                PageNumber = filter.PageNumber,
+                PageSize = filter.PageSize
+            };
         }
 
 
@@ -121,7 +134,7 @@ namespace Kikis_back_refaccionaria.Infrastructure.Repositories {
                 await _unitOfWork.SaveChangeAsync();
 
                 var lastInsert = await GetProducts(new ProductFilter { Id = product.Id }, schema);
-                var productRES = lastInsert.FirstOrDefault();
+                var productRES = lastInsert.Items.FirstOrDefault();
 
 
                 //supplier

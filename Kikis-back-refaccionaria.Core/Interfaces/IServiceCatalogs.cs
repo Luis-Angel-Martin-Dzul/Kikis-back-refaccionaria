@@ -1,4 +1,5 @@
-﻿using Kikis_back_refaccionaria.Core.Request;
+﻿using Kikis_back_refaccionaria.Core.Filters;
+using Kikis_back_refaccionaria.Core.Request;
 using Kikis_back_refaccionaria.Core.Responses;
 
 namespace Kikis_back_refaccionaria.Core.Interfaces {
@@ -7,12 +8,12 @@ namespace Kikis_back_refaccionaria.Core.Interfaces {
         /*
          *  GET
          */
-        Task<IEnumerable<GenericCatalog>> GetProductCategory();
-        Task<IEnumerable<GenericCatalog>> GetProductBrand();
-        Task<IEnumerable<GenericCatalog>> GetProductHallway();
-        Task<IEnumerable<GenericCatalog>> GetProductLevel();
-        Task<IEnumerable<GenericCatalog>> GetProductShelf();
-        Task<IEnumerable<GenericCatalog>> GetProductKit();
+        Task<PagedResponse<GenericCatalog>> GetProductCategory(PaginationFilter filter);
+        Task<PagedResponse<GenericCatalog>> GetProductBrand(PaginationFilter filter);
+        Task<PagedResponse<GenericCatalog>> GetProductHallway(PaginationFilter filter);
+        Task<PagedResponse<GenericCatalog>> GetProductLevel(PaginationFilter filter);
+        Task<PagedResponse<GenericCatalog>> GetProductShelf(PaginationFilter filter);
+        Task<PagedResponse<GenericCatalog>> GetProductKit(PaginationFilter filter);
 
         /*
          *  DELETE

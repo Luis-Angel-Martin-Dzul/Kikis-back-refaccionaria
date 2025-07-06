@@ -8,7 +8,7 @@ namespace Kikis_back_refaccionaria.Core.Interfaces {
         /*
          *  GET
          */
-        Task<IEnumerable<ProductRES>> GetProducts(ProductFilter filter, string schema);
+        Task<PagedResponse<ProductRES>> GetProducts(ProductFilter filter, string schema);
 
 
         /*

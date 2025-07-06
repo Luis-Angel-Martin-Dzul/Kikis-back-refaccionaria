@@ -22,7 +22,7 @@ namespace Kikis_back_refaccionaria.Controllers {
         public async Task<IActionResult> GetProducts([FromQuery] ProductFilter filter) {
 
             var data = await _service.GetProducts(filter, getHostURL());
-            var response = new ApiResponse<IEnumerable<ProductRES>>(data);
+            var response = new ApiResponse<PagedResponse<ProductRES>>(data);
             return Ok(response);
         }
 

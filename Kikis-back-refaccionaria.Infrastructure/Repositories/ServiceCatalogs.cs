@@ -1,9 +1,12 @@
 ﻿using Kikis_back_refaccionaria.Core.Entities;
 using Kikis_back_refaccionaria.Core.Exceptions;
+using Kikis_back_refaccionaria.Core.Filters;
 using Kikis_back_refaccionaria.Core.Interfaces;
 using Kikis_back_refaccionaria.Core.Request;
 using Kikis_back_refaccionaria.Core.Responses;
 using Microsoft.EntityFrameworkCore;
+using System.Diagnostics;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace Kikis_back_refaccionaria.Infrastructure.Repositories {
     public class ServiceCatalogs : IServiceCatalogs {
@@ -16,94 +19,166 @@ namespace Kikis_back_refaccionaria.Infrastructure.Repositories {
         /*
          *  GET
          */
-        public async Task<IEnumerable<GenericCatalog>> GetProductCategory() {
+        public async Task<PagedResponse<GenericCatalog>> GetProductCategory(PaginationFilter filter) {
             var data = _unitOfWork.ProductCategory
                 .GetQuery()
                 .Where(x => x.IsActive == true)
                 .AsNoTracking();
 
-            var response = await data.Select(x => new GenericCatalog {
-                Id = x.Id,
-                Name = x.Name,
-                Description = x.Description
+            int totalItems = await data.CountAsync();
+
+            var response = await data
+                .OrderBy(x => x.Id)
+                .Skip((filter.PageNumber - 1) * filter.PageSize)
+                .Take(filter.PageSize)
+                .Select(x => new GenericCatalog {
+                    Id = x.Id,
+                    Name = x.Name,
+                    Description = x.Description
             }).ToListAsync();
 
-            return response;
+            //response
+            return new PagedResponse<GenericCatalog> {
+                Items = response,
+                TotalItems = totalItems,
+                PageNumber = filter.PageNumber,
+                PageSize = filter.PageSize
+            };
         }
 
-        public async Task<IEnumerable<GenericCatalog>> GetProductBrand() {
+        public async Task<PagedResponse<GenericCatalog>> GetProductBrand(PaginationFilter filter) {
             var data = _unitOfWork.ProductBrand
                 .GetQuery()
                 .Where(x => x.IsActive == true)
                 .AsNoTracking();
 
-            var response = await data.Select(x => new GenericCatalog {
-                Id = x.Id,
-                Name = x.Name,
-                Description = x.Description
+            int totalItems = await data.CountAsync();
+
+            var response = await data
+                .OrderBy(x => x.Id)
+                .Skip((filter.PageNumber - 1) * filter.PageSize)
+                .Take(filter.PageSize)
+                .Select(x => new GenericCatalog {
+                    Id = x.Id,
+                    Name = x.Name,
+                    Description = x.Description
             }).ToListAsync();
 
-            return response;
+            //response
+            return new PagedResponse<GenericCatalog> {
+                Items = response,
+                TotalItems = totalItems,
+                PageNumber = filter.PageNumber,
+                PageSize = filter.PageSize
+            };
         }
 
-        public async Task<IEnumerable<GenericCatalog>> GetProductHallway() {
+        public async Task<PagedResponse<GenericCatalog>> GetProductHallway(PaginationFilter filter) {
 
             var data = _unitOfWork.ProductHallway
                 .GetQuery()
                 .Where(x => x.IsActive == true)
                 .AsNoTracking();
 
-            var response = data.Select(x => new GenericCatalog {
-                Id = x.Id,
-                Name = x.Name
+            int totalItems = await data.CountAsync();
+
+            var response = data
+                .OrderBy(x => x.Id)
+                .Skip((filter.PageNumber - 1) * filter.PageSize)
+                .Take(filter.PageSize)
+                .Select(x => new GenericCatalog {
+                    Id = x.Id,
+                    Name = x.Name
             }).ToList();
 
-            return response;
+            //response
+            return new PagedResponse<GenericCatalog> {
+                Items = response,
+                TotalItems = totalItems,
+                PageNumber = filter.PageNumber,
+                PageSize = filter.PageSize
+            };
         }
 
-        public async Task<IEnumerable<GenericCatalog>> GetProductLevel() {
+        public async Task<PagedResponse<GenericCatalog>> GetProductLevel(PaginationFilter filter) {
 
             var data = _unitOfWork.ProductLevel
                 .GetQuery()
                 .Where(x => x.IsActive == true)
                 .AsNoTracking();
 
-            var response = data.Select(x => new GenericCatalog {
-                Id = x.Id,
-                Name = x.Name
+            int totalItems = await data.CountAsync();
+
+            var response = data
+                .OrderBy(x => x.Id)
+                .Skip((filter.PageNumber - 1) * filter.PageSize)
+                .Take(filter.PageSize)
+                .Select(x => new GenericCatalog {
+                    Id = x.Id,
+                    Name = x.Name
             }).ToList();
 
-            return response;
+            //response
+            return new PagedResponse<GenericCatalog> {
+                Items = response,
+                TotalItems = totalItems,
+                PageNumber = filter.PageNumber,
+                PageSize = filter.PageSize
+            };
         }
 
-        public async Task<IEnumerable<GenericCatalog>> GetProductShelf() {
+        public async Task<PagedResponse<GenericCatalog>> GetProductShelf(PaginationFilter filter) {
 
             var data = _unitOfWork.ProductShelf
                 .GetQuery()
                 .Where(x => x.IsActive == true)
                 .AsNoTracking();
 
-            var response = data.Select(x => new GenericCatalog {
-                Id = x.Id,
-                Name = x.Name
+            int totalItems = await data.CountAsync();
+
+            var response = data
+                .OrderBy(x => x.Id)
+                .Skip((filter.PageNumber - 1) * filter.PageSize)
+                .Take(filter.PageSize)
+                .Select(x => new GenericCatalog {
+                    Id = x.Id,
+                    Name = x.Name
             }).ToList();
 
-            return response;
+            //response
+            return new PagedResponse<GenericCatalog> {
+                Items = response,
+                TotalItems = totalItems,
+                PageNumber = filter.PageNumber,
+                PageSize = filter.PageSize
+            };
         }
 
-        public async Task<IEnumerable<GenericCatalog>> GetProductKit() {
+        public async Task<PagedResponse<GenericCatalog>> GetProductKit(PaginationFilter filter) {
 
             var data = _unitOfWork.Kit
                 .GetQuery()
                 .Where(x => x.IsActive == true)
                 .AsNoTracking();
 
-            var response = data.Select(x => new GenericCatalog {
-                Id = x.Id,
-                Name = x.Name
+            int totalItems = await data.CountAsync();
+
+            var response = data
+                .OrderBy(x => x.Id)
+                .Skip((filter.PageNumber - 1) * filter.PageSize)
+                .Take(filter.PageSize)
+                .Select(x => new GenericCatalog {
+                    Id = x.Id,
+                    Name = x.Name
             }).ToList();
 
-            return response;
+            //response
+            return new PagedResponse<GenericCatalog> {
+                Items = response,
+                TotalItems = totalItems,
+                PageNumber = filter.PageNumber,
+                PageSize = filter.PageSize
+            };
         }
 
 
