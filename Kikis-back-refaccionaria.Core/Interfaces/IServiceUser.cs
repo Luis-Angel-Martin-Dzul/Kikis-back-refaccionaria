@@ -8,8 +8,8 @@ namespace Kikis_back_refaccionaria.Core.Interfaces {
         /*
          *  GET
          */
-        Task<IEnumerable<RolRES>> GetRols(RolFilter filter);
-        Task<IEnumerable<UserRES>> GetUsers(UserFilter filter);
+        Task<PagedResponse<RolRES>> GetRols(RolFilter filter);
+        Task<PagedResponse<UserRES>> GetUsers(UserFilter filter);
 
 
         /*

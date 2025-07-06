@@ -22,7 +22,7 @@ namespace Kikis_back_refaccionaria.Controllers {
         public async Task<IActionResult> GetUsers([FromQuery] UserFilter filter) {
 
             var data = await _service.GetUsers(filter);
-            var response = new ApiResponse<IEnumerable<UserRES>>(data);
+            var response = new ApiResponse<PagedResponse<UserRES>>(data);
             return Ok(response);
         }
         [Route("rols/")]
@@ -30,7 +30,7 @@ namespace Kikis_back_refaccionaria.Controllers {
         public async Task<IActionResult> GetRols([FromQuery] RolFilter filter) {
 
             var data = await _service.GetRols(filter);
-            var response = new ApiResponse<IEnumerable<RolRES>>(data);
+            var response = new ApiResponse<PagedResponse<RolRES>>(data);
             return Ok(response);
         }
 

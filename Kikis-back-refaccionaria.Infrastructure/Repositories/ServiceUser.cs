@@ -20,11 +20,11 @@ namespace Kikis_back_refaccionaria.Infrastructure.Repositories {
         /*
          *  GET
          */
-        public async Task<IEnumerable<RolRES>> GetRols(RolFilter filter) {
+        public async Task<PagedResponse<RolRES>> GetRols(RolFilter filter) {
+
             //query
             var query = _unitOfWork.Permission
                 .GetQuery()
-                .Include(p => p.ModuleNavigation)
                 .Include(p => p.RolNavigation)
                 .AsNoTracking();
 
@@ -32,10 +32,32 @@ namespace Kikis_back_refaccionaria.Infrastructure.Repositories {
             if(filter.Id != null)
                 query = query.Where(x => x.Rol == filter.Id);
 
-            var rols = await query.ToListAsync();
+            var groupedRoles = query.Select(p => new {
+                    Id = p.RolNavigation.Id,
+                    Name = p.RolNavigation.Name
+                })
+                .Distinct();
+            int totalItems = await groupedRoles.CountAsync();
 
-            // Agrupar
-            var grouped = rols
+            //pagination
+            var pagedRoles = await groupedRoles
+                .OrderBy(r => r.Id)
+                .Skip((filter.PageNumber - 1) * filter.PageSize)
+                .Take(filter.PageSize)
+                .ToListAsync();
+            var pagedRoleIds = pagedRoles.Select(r => r.Id).ToList();
+
+            //data
+            var permissions = await _unitOfWork.Permission
+                .GetQuery()
+                .Include(p => p.ModuleNavigation)
+                .Include(p => p.RolNavigation)
+                .Where(p => pagedRoleIds.Contains(p.RolNavigation.Id))
+                .AsNoTracking()
+                .ToListAsync();
+
+            //group
+            var rols = permissions
                 .GroupBy(p => new { p.RolNavigation.Id, p.RolNavigation.Name })
                 .Select(g => new RolRES {
                     Id = g.Key.Id,
@@ -52,11 +74,20 @@ namespace Kikis_back_refaccionaria.Infrastructure.Repositories {
                             CanView = p.CanView
                         }
                     }).ToList()
-                }).ToList();
+                })
+                .ToList();
 
-            return grouped;
+            //response
+            return new PagedResponse<RolRES> {
+                Items = rols,
+                TotalItems = totalItems,
+                PageNumber = filter.PageNumber,
+                PageSize = filter.PageSize
+            };
         }
-        public async Task<IEnumerable<UserRES>> GetUsers(UserFilter filter) {
+
+
+        public async Task<PagedResponse<UserRES>> GetUsers(UserFilter filter) {
 
             //query
             var query = _unitOfWork.User
@@ -71,8 +102,14 @@ namespace Kikis_back_refaccionaria.Infrastructure.Repositories {
             if(filter.Roles != null && filter.Roles.Any())
                 query = query.Where(x => filter.Roles.Contains(x.Rol));
 
+            int totalItems = await query.CountAsync();
+
             //select
-            var users = await query.Select(x => new UserRES {
+            var users = await query
+                .OrderBy(x => x.Id)
+                .Skip((filter.PageNumber - 1) * filter.PageSize)
+                .Take(filter.PageSize)
+                .Select(x => new UserRES {
                 Id = x.Id,
                 FirstName = x.FirstName,
                 LastName = x.LastName,
@@ -84,7 +121,13 @@ namespace Kikis_back_refaccionaria.Infrastructure.Repositories {
                 }
             }).ToListAsync();
 
-            return users;
+            //response
+            return new PagedResponse<UserRES> {
+                Items = users,
+                TotalItems = totalItems,
+                PageNumber = filter.PageNumber,
+                PageSize = filter.PageSize
+            };
         }
 
 
@@ -141,7 +184,7 @@ namespace Kikis_back_refaccionaria.Infrastructure.Repositories {
                 _emailService.SendUserPasswordEmail(user.Email, password);
 
                 var lastInsert = await GetUsers(new UserFilter { Id = user.Id });
-                var response = lastInsert.FirstOrDefault();
+                var response = lastInsert.Items.FirstOrDefault();
 
                 return response;
             }
@@ -176,7 +219,7 @@ namespace Kikis_back_refaccionaria.Infrastructure.Repositories {
                     Email = user.Email,
                     Curp = user.Curp,
                 };
-                response.Rol = rol.FirstOrDefault();
+                response.Rol = rol.Items.FirstOrDefault();
 
                 return response;
 
