@@ -8,8 +8,8 @@ namespace Kikis_back_refaccionaria.Core.Interfaces {
         /*
          *  GET
          */
-        Task<IEnumerable<SaleRES>> GetSales(SaleFilter filter);
-        Task<IEnumerable<InvoiceRES>> GetInvoices(InvoiceFilter filter);
+        Task<PagedResponse<SaleRES>> GetSales(SaleFilter filter);
+        Task<PagedResponse<InvoiceRES>> GetInvoices(InvoiceFilter filter);
 
 
         /*

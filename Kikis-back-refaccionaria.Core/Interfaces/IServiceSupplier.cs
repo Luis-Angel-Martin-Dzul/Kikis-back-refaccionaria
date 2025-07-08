@@ -1,4 +1,5 @@
-﻿using Kikis_back_refaccionaria.Core.Responses;
+﻿using Kikis_back_refaccionaria.Core.Filters;
+using Kikis_back_refaccionaria.Core.Responses;
 
 namespace Kikis_back_refaccionaria.Core.Interfaces {
     public interface IServiceSupplier {
@@ -6,7 +7,7 @@ namespace Kikis_back_refaccionaria.Core.Interfaces {
         /*
          *  GET
          */
-        Task<IEnumerable<SupplierRES>> GetSupplier();
+        Task<PagedResponse<SupplierRES>> GetSupplier(PaginationFilter filter);
 
 
         /*

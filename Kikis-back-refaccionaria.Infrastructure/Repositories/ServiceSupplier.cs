@@ -1,7 +1,9 @@
 ﻿using Kikis_back_refaccionaria.Core.Entities;
 using Kikis_back_refaccionaria.Core.Exceptions;
+using Kikis_back_refaccionaria.Core.Filters;
 using Kikis_back_refaccionaria.Core.Interfaces;
 using Kikis_back_refaccionaria.Core.Responses;
+using Microsoft.EntityFrameworkCore;
 
 namespace Kikis_back_refaccionaria.Infrastructure.Repositories {
     public class ServiceSupplier : IServiceSupplier {
@@ -15,27 +17,40 @@ namespace Kikis_back_refaccionaria.Infrastructure.Repositories {
         /*
          *  GET
          */
-        public async Task<IEnumerable<SupplierRES>> GetSupplier() {
+        public async Task<PagedResponse<SupplierRES>> GetSupplier(PaginationFilter filter) {
 
-            var supplier = await _unitOfWork.Supplier.GetAll();
+            var query = _unitOfWork.Supplier
+                .GetQuery()
+                .AsNoTracking();
 
-            var response = supplier.Select(x => new SupplierRES {
+            int totalItems = await query.CountAsync();
 
-                Id = x.Id,
-                BusinessName = x.BusinessName,
-                TradeName = x.TradeName,
-                Rfc = x.RFC,
-                Curp = x.CURP,
-                Email = x.Email,
-                Cellphone = x.Cellphone,
-                Cellphone2 = x.Cellphone2,
-                Address = x.Address,
-                Owner = x.Owner,
-                Representative = x.Representative,
-                IsActive = x.IsActive,
-            }).ToList();
+            var suppliers = await query
+                .OrderBy(x => x.Id)
+                .Skip((filter.PageNumber - 1) * filter.PageSize)
+                .Take(filter.PageSize)
+                .Select(x => new SupplierRES {
+                    Id = x.Id,
+                    BusinessName = x.BusinessName,
+                    TradeName = x.TradeName,
+                    Rfc = x.RFC,
+                    Curp = x.CURP,
+                    Email = x.Email,
+                    Cellphone = x.Cellphone,
+                    Cellphone2 = x.Cellphone2,
+                    Address = x.Address,
+                    Owner = x.Owner,
+                    Representative = x.Representative,
+                    IsActive = x.IsActive,
+            }).ToListAsync();
 
-            return response;
+            //response
+            return new PagedResponse<SupplierRES> {
+                Items = suppliers,
+                TotalItems = totalItems,
+                PageNumber = filter.PageNumber,
+                PageSize = filter.PageSize
+            };
         }
 
 

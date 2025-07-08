@@ -22,7 +22,7 @@ namespace Kikis_back_refaccionaria.Controllers {
         public async Task<IActionResult> GetClients([FromQuery] ClientFilter filter) {
 
             var data = await _service.GetClients(filter);
-            var response = new ApiResponse<IEnumerable<ClientRES>>(data);
+            var response = new ApiResponse<PagedResponse<ClientRES>>(data);
             return Ok(response);
         }
 

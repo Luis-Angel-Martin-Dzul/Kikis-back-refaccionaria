@@ -25,7 +25,7 @@ namespace Kikis_back_refaccionaria.Infrastructure.Repositories {
         /*
          *  GET
          */
-        public async Task<IEnumerable<SaleRES>> GetSales(SaleFilter filter) {
+        public async Task<PagedResponse<SaleRES>> GetSales(SaleFilter filter) {
 
             //query
             var query = _unitOfWork.Sale
@@ -40,34 +40,46 @@ namespace Kikis_back_refaccionaria.Infrastructure.Repositories {
             if(filter.Id != null)
                 query = query.Where(x => x.Id == filter.Id);
 
+            int totalItems = await query.CountAsync();
+
             //select
-            var sales = await query.Select(sale => new SaleRES {
-                Id = sale.Id,
-                Seller = new GenericCatalog {
-                    Id = sale.SellerNavigation.Id,
-                    Name = $"{sale.SellerNavigation.FirstName} {sale.SellerNavigation.LastName}"
-                },
-                SubTotal = sale.SubTotal,
-                Iva = sale.IVA,
-                Total = sale.Total,
-                Pay = sale.Pay,
-                CreateDate = sale.CreateDate,
-                SaleDetails = sale.TbSaleDetails.Select(sale => new SaleDetail {
+            var sales = await query
+                .OrderBy(x => x.Id)
+                .Skip((filter.PageNumber - 1) * filter.PageSize)
+                .Take(filter.PageSize)
+                .Select(sale => new SaleRES {
                     Id = sale.Id,
-                    Product = sale.Product,
-                    Name = sale.ProductNavigation.Name,
-                    Price = sale.Price,
-                    PriceUnit = sale.PriceUnit,
-                    Quantity = sale.Quantity,
+                    Seller = new GenericCatalog {
+                        Id = sale.SellerNavigation.Id,
+                        Name = $"{sale.SellerNavigation.FirstName} {sale.SellerNavigation.LastName}"
+                    },
+                    SubTotal = sale.SubTotal,
+                    Iva = sale.IVA,
                     Total = sale.Total,
-                }).ToList(),
-                Invoice = sale.TbInvoices.Count() == 0 ? 0 : sale.TbInvoices.FirstOrDefault().Id
+                    Pay = sale.Pay,
+                    CreateDate = sale.CreateDate,
+                    SaleDetails = sale.TbSaleDetails.Select(sale => new SaleDetail {
+                        Id = sale.Id,
+                        Product = sale.Product,
+                        Name = sale.ProductNavigation.Name,
+                        Price = sale.Price,
+                        PriceUnit = sale.PriceUnit,
+                        Quantity = sale.Quantity,
+                        Total = sale.Total,
+                    }).ToList(),
+                    Invoice = sale.TbInvoices.Count() == 0 ? 0 : sale.TbInvoices.FirstOrDefault().Id
             }).ToListAsync();
 
-            return sales;
+            //response
+            return new PagedResponse<SaleRES> {
+                Items = sales,
+                TotalItems = totalItems,
+                PageNumber = filter.PageNumber,
+                PageSize = filter.PageSize
+            };
         }
 
-        public async Task<IEnumerable<InvoiceRES>> GetInvoices(InvoiceFilter filter) {
+        public async Task<PagedResponse<InvoiceRES>> GetInvoices(InvoiceFilter filter) {
 
             //query
             var query = _unitOfWork.Invoice
@@ -78,23 +90,34 @@ namespace Kikis_back_refaccionaria.Infrastructure.Repositories {
             if(filter.Id != null)
                 query = query.Where(x => x.Id == filter.Id);
 
-            //select
-            var invoices = await query.Select(invoice => new InvoiceRES {
+            int totalItems = await query.CountAsync();
 
-                Id = invoice.Id,
-                Sale = invoice.Sale,
-                Name = invoice.Name,
-                RFC = invoice.RFC,
-                CodePostal = invoice.CodePostal,
-                Contact = invoice.Contact,
-                TaxRegime = invoice.TaxRegime,
-                TaxRegimeName = invoice.TaxRegimeName,
-                UseCFDI = invoice.UseCFDI,
-                UseCFDIName = invoice.UseCFDIName,
-                CreateDate = invoice.CreateDate,
+            //select
+            var invoices = await query
+                .OrderBy(x => x.Id)
+                .Skip((filter.PageNumber - 1) * filter.PageSize)
+                .Take(filter.PageSize)
+                .Select(invoice => new InvoiceRES {
+                    Id = invoice.Id,
+                    Sale = invoice.Sale,
+                    Name = invoice.Name,
+                    RFC = invoice.RFC,
+                    CodePostal = invoice.CodePostal,
+                    Contact = invoice.Contact,
+                    TaxRegime = invoice.TaxRegime,
+                    TaxRegimeName = invoice.TaxRegimeName,
+                    UseCFDI = invoice.UseCFDI,
+                    UseCFDIName = invoice.UseCFDIName,
+                    CreateDate = invoice.CreateDate,
             }).ToListAsync();
 
-            return invoices;
+            //response
+            return new PagedResponse<InvoiceRES> {
+                Items = invoices,
+                TotalItems = totalItems,
+                PageNumber = filter.PageNumber,
+                PageSize = filter.PageSize
+            };
         }
 
 
@@ -181,7 +204,7 @@ namespace Kikis_back_refaccionaria.Infrastructure.Repositories {
 
                 var sale = await GetSales(new SaleFilter { Id = request.Sale });
 
-                _emailService.SendCFDI(invoice, sale.FirstOrDefault());
+                _emailService.SendCFDI(invoice, sale.Items.FirstOrDefault());
 
                 return invoice.Id;
             }
@@ -196,10 +219,10 @@ namespace Kikis_back_refaccionaria.Infrastructure.Repositories {
 
                 //invoice
                 var invoices = await GetInvoices(new InvoiceFilter { Id = request.Invoice });
-                if(invoices.Count() <= 0)
+                if(invoices.Items.Count() <= 0)
                     throw new BusinessException("No se encontro factura");
 
-                var invoice = invoices.FirstOrDefault();
+                var invoice = invoices.Items.FirstOrDefault();
                 var invoiceMap = new TbInvoice {
 
                     Id = invoice.Id,
@@ -220,7 +243,7 @@ namespace Kikis_back_refaccionaria.Infrastructure.Repositories {
                 if(sale == null)
                     throw new BusinessException("No se encontro venta");
 
-                _emailService.SendCFDI(invoiceMap, sale.FirstOrDefault());
+                _emailService.SendCFDI(invoiceMap, sale.Items.FirstOrDefault());
 
                 return true;
             }

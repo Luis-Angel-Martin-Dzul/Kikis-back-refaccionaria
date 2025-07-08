@@ -18,7 +18,7 @@ namespace Kikis_back_refaccionaria.Infrastructure.Repositories {
         /*
          *  GET
          */
-        public async Task<IEnumerable<ClientRES>> GetClients(ClientFilter filter) {
+        public async Task<PagedResponse<ClientRES>> GetClients(ClientFilter filter) {
 
             //query
             var query = _unitOfWork.Client
@@ -38,19 +38,31 @@ namespace Kikis_back_refaccionaria.Infrastructure.Repositories {
                     (x.LastName + " " + x.FirstName).ToLower().Contains(nameToSearch));
             }
 
-            var clients = await query.ToListAsync();
+            int totalItems = await query.CountAsync();
+
 
             // Agrupar
-            var response = clients.Select(x => new ClientRES {
-                Id = x.Id,
-                FirstName = x.FirstName,
-                LastName = x.LastName,
-                Cellphone = x.Cellphone,
-                Email = x.Email,
-                Address = x.Address,
-            }).ToList();
+            var clients = await query
+                .OrderBy(x => x.Id)
+                .Skip((filter.PageNumber - 1) * filter.PageSize)
+                .Take(filter.PageSize)
+                .Select(x => new ClientRES {
+                    Id = x.Id,
+                    FirstName = x.FirstName,
+                    LastName = x.LastName,
+                    Cellphone = x.Cellphone,
+                    Email = x.Email,
+                    Address = x.Address,
+            }).ToListAsync();
 
-            return response;
+
+            //response
+            return new PagedResponse<ClientRES> {
+                Items = clients,
+                TotalItems = totalItems,
+                PageNumber = filter.PageNumber,
+                PageSize = filter.PageSize
+            };
         }
 
 
@@ -100,7 +112,7 @@ namespace Kikis_back_refaccionaria.Infrastructure.Repositories {
                 await _unitOfWork.SaveChangeAsync();
 
                 var lastInsert = await GetClients(new ClientFilter { Id = client.Id });
-                var response = lastInsert.FirstOrDefault();
+                var response = lastInsert.Items.FirstOrDefault();
 
                 return response;
             }

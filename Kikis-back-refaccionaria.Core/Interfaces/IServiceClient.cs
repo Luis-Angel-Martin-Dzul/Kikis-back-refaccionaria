@@ -8,7 +8,7 @@ namespace Kikis_back_refaccionaria.Core.Interfaces {
         /*
          *  GET
          */
-        Task<IEnumerable<ClientRES>> GetClients(ClientFilter filter);
+        Task<PagedResponse<ClientRES>> GetClients(ClientFilter filter);
 
 
         /*

@@ -22,7 +22,7 @@ namespace Kikis_back_refaccionaria.Controllers {
         public async Task<IActionResult> GetTools([FromQuery] SaleFilter filter) {
 
             var data = await _service.GetSales(filter);
-            var response = new ApiResponse<IEnumerable<SaleRES>>(data);
+            var response = new ApiResponse<PagedResponse<SaleRES>>(data);
             return Ok(response);
         }
         [Route("invoice/")]
@@ -30,7 +30,7 @@ namespace Kikis_back_refaccionaria.Controllers {
         public async Task<IActionResult> GetTools([FromQuery] InvoiceFilter filter) {
 
             var data = await _service.GetInvoices(filter);
-            var response = new ApiResponse<IEnumerable<InvoiceRES>>(data);
+            var response = new ApiResponse<PagedResponse<InvoiceRES>>(data);
             return Ok(response);
         }
 

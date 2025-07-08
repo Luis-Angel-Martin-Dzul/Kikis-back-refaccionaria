@@ -42,6 +42,25 @@ namespace Kikis_back_refaccionaria.Infrastructure.Repositories {
             //filter
             if(filter.Id != null)
                 query = query.Where(x => x.Id == filter.Id);
+            if(filter.Category != null)
+                query = query.Where(x => x.CategoryNavigation.Name == filter.Category);
+            if(filter.Brand != null)
+                query = query.Where(x => x.BrandNavigation.Name == filter.Brand);
+            if(filter.Supplier != null)
+                query = query.Where(x => x.TbProductSuppliers.Any(s => s.Supplier == filter.Supplier));
+            if(filter.Hallway != null)
+                query = query.Where(x => x.Hallway == filter.Hallway);
+            if(filter.Level != null)
+                query = query.Where(x => x.Level == filter.Level);
+            if(filter.Shelf != null)
+                query = query.Where(x => x.Shelf == filter.Shelf);
+            if(filter.Kit != null)
+                query = query.Where(x => x.TbProductKits.Any(s => s.Kit == filter.Kit));
+            if(filter.MinPrice != null)
+                query = query.Where(x => x.Price >= filter.MinPrice);
+            if(filter.MaxPrice != null)
+                query = query.Where(x => x.Price <= filter.MaxPrice);
+
 
             int totalItems = await query.CountAsync();
 

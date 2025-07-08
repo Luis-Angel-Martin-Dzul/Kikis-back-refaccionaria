@@ -2,8 +2,8 @@
     public class ProductFilter : PaginationFilter {
 
         public int? Id { get; set; }
-        public int? Category { get; set; }
-        public int? Brand { get; set; }
+        public string? Category { get; set; }
+        public string? Brand { get; set; }
         public int? Supplier { get; set; }
         public int? Hallway { get; set; }
         public int? Level { get; set; }

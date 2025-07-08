@@ -1,4 +1,5 @@
-﻿using Kikis_back_refaccionaria.Core.Interfaces;
+﻿using Kikis_back_refaccionaria.Core.Filters;
+using Kikis_back_refaccionaria.Core.Interfaces;
 using Kikis_back_refaccionaria.Core.Responses;
 using Microsoft.AspNetCore.Mvc;
 
@@ -17,10 +18,10 @@ namespace Kikis_back_refaccionaria.Controllers {
          *  GET
          */
         [HttpGet]
-        public async Task<IActionResult> GetSupplier() {
+        public async Task<IActionResult> GetSupplier([FromQuery] PaginationFilter filter) {
 
-            var data = await _service.GetSupplier();
-            var response = new ApiResponse<IEnumerable<SupplierRES>>(data);
+            var data = await _service.GetSupplier(filter);
+            var response = new ApiResponse<PagedResponse<SupplierRES>>(data);
             return Ok(response);
         }
 
