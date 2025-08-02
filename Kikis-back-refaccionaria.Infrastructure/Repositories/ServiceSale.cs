@@ -1,16 +1,10 @@
-﻿using AutoMapper;
-using Kikis_back_refaccionaria.Core.Entities;
+﻿using Kikis_back_refaccionaria.Core.Entities;
 using Kikis_back_refaccionaria.Core.Exceptions;
 using Kikis_back_refaccionaria.Core.Filters;
 using Kikis_back_refaccionaria.Core.Interfaces;
 using Kikis_back_refaccionaria.Core.Request;
 using Kikis_back_refaccionaria.Core.Responses;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Kikis_back_refaccionaria.Infrastructure.Repositories {
     public class ServiceSale : IServiceSale {

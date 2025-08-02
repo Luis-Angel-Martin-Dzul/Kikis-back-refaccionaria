@@ -85,5 +85,37 @@ namespace Kikis_back_refaccionaria.Controllers {
             var response = new ApiResponse<DeliveryDetailRES>(data);
             return Ok(response);
         }
+        [Route("track/start/{id}")]
+        [HttpPut]
+        public async Task<IActionResult> PutTrackStart(int id) {
+
+            var data = await _service.PutTrackStart(id);
+            var response = new ApiResponse<TrackRES>(data);
+            return Ok(response);
+        }
+        [Route("track/cancel/{id}")]
+        [HttpPut]
+        public async Task<IActionResult> PutTrackCancel(int id) {
+
+            var data = await _service.PutTrackCancel(id);
+            var response = new ApiResponse<TrackRES>(data);
+            return Ok(response);
+        }
+        [Route("track/finish/{id}")]
+        [HttpPut]
+        public async Task<IActionResult> PutTrackFinish(int id) {
+
+            var data = await _service.PutTrackFinish(id);
+            var response = new ApiResponse<TrackRES>(data);
+            return Ok(response);
+        }
+        [Route("deliver/")]
+        [HttpPut]
+        public async Task<IActionResult> PutDeliverDelivery([FromQuery] DeliverDeliveryREQ request) {
+
+            var data = await _service.PutDeliverDelivery(request);
+            var response = new ApiResponse<bool>(data);
+            return Ok(response);
+        }
     }
 }

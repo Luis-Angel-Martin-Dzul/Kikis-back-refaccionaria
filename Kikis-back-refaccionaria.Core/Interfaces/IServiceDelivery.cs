@@ -30,5 +30,9 @@ namespace Kikis_back_refaccionaria.Core.Interfaces {
          */
         Task<TrackRES> PutTrack(TrackREQ request);
         Task<DeliveryDetailRES> PutDeliveryDetail(DeliveryDetailREQ request);
+        Task<TrackRES> PutTrackStart(int id);
+        Task<TrackRES> PutTrackCancel(int id);
+        Task<TrackRES> PutTrackFinish(int id);
+        Task<bool> PutDeliverDelivery(DeliverDeliveryREQ request);
     }
 }

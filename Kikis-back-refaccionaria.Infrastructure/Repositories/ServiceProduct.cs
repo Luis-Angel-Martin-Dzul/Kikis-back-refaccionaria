@@ -7,7 +7,6 @@ using Kikis_back_refaccionaria.Core.Request;
 using Kikis_back_refaccionaria.Core.Responses;
 using Kikis_back_refaccionaria.Infrastructure.Utilities;
 using Microsoft.EntityFrameworkCore;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Kikis_back_refaccionaria.Infrastructure.Repositories {
     public class ServiceProduct : IServiceProduct {

@@ -5,8 +5,6 @@ using Kikis_back_refaccionaria.Core.Interfaces;
 using Kikis_back_refaccionaria.Core.Request;
 using Kikis_back_refaccionaria.Core.Responses;
 using Microsoft.EntityFrameworkCore;
-using System.Diagnostics;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace Kikis_back_refaccionaria.Infrastructure.Repositories {
     public class ServiceCatalogs : IServiceCatalogs {

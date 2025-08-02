@@ -1,14 +1,5 @@
 ﻿using AutoMapper;
-using Kikis_back_refaccionaria.Core.Entities;
-using Kikis_back_refaccionaria.Core.Exceptions;
-using Kikis_back_refaccionaria.Core.Filters;
 using Kikis_back_refaccionaria.Core.Interfaces;
-using Kikis_back_refaccionaria.Core.Request;
-using Kikis_back_refaccionaria.Core.Responses;
-using Kikis_back_refaccionaria.Infrastructure.Encryption;
-using Kikis_back_refaccionaria.Infrastructure.Utilities;
-using Microsoft.EntityFrameworkCore;
-using System.Linq;
 
 namespace Kikis_back_refaccionaria.Infrastructure.Repositories {
     public class Service : IService {

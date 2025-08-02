@@ -170,7 +170,7 @@ namespace Kikis_back_refaccionaria.Infrastructure.Repositories {
                     User = request.User,
                     Name = request.Name,
                     CreateDate = request.CreateDate,
-                    Status = request.Deliveries.Count >= 1 ? 2 : 1,
+                    Status = request.Deliveries.Count >= 1 ? 3 : 2,
                     IsActive = true,
                 };
 
@@ -255,6 +255,7 @@ namespace Kikis_back_refaccionaria.Infrastructure.Repositories {
 
                 //track
                 var track = await _unitOfWork.Track.GetById((int)request.Id);
+                track.Status = request.Deliveries.Count == 0 ? 2 : 3;
                 track.Name = request.Name;
                 track.User = request.User;
 
@@ -351,6 +352,102 @@ namespace Kikis_back_refaccionaria.Infrastructure.Repositories {
             catch(Exception ex) {
 
                 throw new BusinessException($"Ocurrió un error inesperado al intentar agregar entrega\n{ex.Message}");
+            }
+        }
+        public async Task<TrackRES> PutTrackStart(int id) {
+            try {
+
+                var track = await _unitOfWork.Track.GetById(id);
+
+                if(track.Status == 1 || track.Status == 2)
+                    throw new BusinessException("No se tiene asignado entregas, no se puede iniciar una ruta sin entregas");
+
+                track.Status = 4;
+
+                _unitOfWork.Track.Update(track);
+                await _unitOfWork.SaveChangeAsync();
+
+                var lastInsert = await GetTracks(new TrackFilter { Id = track.Id });
+                var response = lastInsert.Items.FirstOrDefault();
+
+                return response;
+            }
+            catch(Exception ex) {
+
+                throw new BusinessException($"Ocurrió un error inesperado al intentar iniciar ruta\n{ex.Message}");
+            }
+        }
+        public async Task<TrackRES> PutTrackCancel(int id) {
+            try {
+
+                var track = await _unitOfWork.Track.GetById(id);
+
+                if(track.Status <= 3)
+                    throw new BusinessException("La ruta aun no ha sido iniciada");
+
+                if(track.Status == 5)
+                    throw new BusinessException("La ruta ya fue finalizada");
+
+                track.Status = 6;
+
+                _unitOfWork.Track.Update(track);
+                await _unitOfWork.SaveChangeAsync();
+
+                var lastInsert = await GetTracks(new TrackFilter { Id = track.Id });
+                var response = lastInsert.Items.FirstOrDefault();
+
+                return response;
+            }
+            catch(Exception ex) {
+
+                throw new BusinessException($"Ocurrió un error inesperado al intentar cancelar ruta\n{ex.Message}");
+            }
+        }
+        public async Task<TrackRES> PutTrackFinish(int id) {
+            try {
+
+                var track = await _unitOfWork.Track.GetById(id);
+
+                if(track.Status <= 3)
+                    throw new BusinessException("La ruta aun no ha sido iniciada");
+
+                if(track.Status == 6)
+                    throw new BusinessException("La ruta ya fue cancelada");
+
+                track.Status = 5;
+
+                _unitOfWork.Track.Update(track);
+                await _unitOfWork.SaveChangeAsync();
+
+                var lastInsert = await GetTracks(new TrackFilter { Id = track.Id });
+                var response = lastInsert.Items.FirstOrDefault();
+
+                return response;
+            }
+            catch(Exception ex) {
+
+                throw new BusinessException($"Ocurrió un error inesperado al intentar cancelar ruta\n{ex.Message}");
+            }
+        }
+        public async Task<bool> PutDeliverDelivery(DeliverDeliveryREQ request) {
+            try {
+
+                var delivery = await _unitOfWork.DeliveryDetail.GetById(request.Delivery);
+
+                if(delivery == null)
+                    throw new BusinessException("La entrega no fue encontrada o no existe");
+
+                delivery.Status = request.Status;
+                delivery.Comments = request.Comment;
+
+                _unitOfWork.DeliveryDetail.Update(delivery);
+                await _unitOfWork.SaveChangeAsync();
+
+                return true;
+            }
+            catch(Exception ex) {
+
+                throw new BusinessException($"Ocurrió un error inesperado al intentar traer entrega\n{ex.Message}");
             }
         }
     }
