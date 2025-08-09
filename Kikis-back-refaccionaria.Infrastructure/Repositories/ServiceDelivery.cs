@@ -5,6 +5,7 @@ using Kikis_back_refaccionaria.Core.Interfaces;
 using Kikis_back_refaccionaria.Core.Request;
 using Kikis_back_refaccionaria.Core.Responses;
 using Microsoft.EntityFrameworkCore;
+using System.Linq;
 
 namespace Kikis_back_refaccionaria.Infrastructure.Repositories {
     public class ServiceDelivery : IServiceDelivery {
@@ -136,15 +137,46 @@ namespace Kikis_back_refaccionaria.Infrastructure.Repositories {
         public async Task<bool> DeleteTrack(int id) {
 
             try {
+                await _unitOfWork.BeginTransactionAsync();
 
                 var track = await _unitOfWork.Track.GetById(id);
                 if(track == null)
                     throw new BusinessException("Ruta no encontrada");
 
-                track.IsActive = false;
+                //get track deliveries
+                var trackDeliveries = await _unitOfWork.TrackDelivery
+                    .GetQuery()
+                    .AsNoTracking()
+                    .Where(x => x.Track == track.Id)
+                    .Select(x => x.Delivery)
+                    .ToListAsync();
+                if(!trackDeliveries.Any())
+                    throw new BusinessException("No se encontro entregas relacionadas a esta ruta");
 
+                //get deliveries details
+                var deliveries = await _unitOfWork.DeliveryDetail
+                   .GetQuery()
+                   .Where(d => trackDeliveries.Contains(d.Id))
+                   .ToListAsync();
+                if(!deliveries.Any())
+                    throw new BusinessException("No se obtuvo entregas relacionadas a esta ruta");
+
+                //Free deliveries
+                foreach(var delivery in deliveries) {
+
+                    delivery.Status = 1;
+                }
+                _unitOfWork.DeliveryDetail.UpdateRange(deliveries);
+                await _unitOfWork.SaveChangeAsync();
+
+
+                //Cancel track
+                track.IsActive = false;
                 _unitOfWork.Track.Update(track);
                 await _unitOfWork.SaveChangeAsync();
+
+
+                await _unitOfWork.CommitTransactionAsync();
 
                 return true;
             }
