@@ -33,6 +33,10 @@ namespace Kikis_back_refaccionaria.Infrastructure.Repositories {
             //filter
             if(filter.Id != null)
                 query = query.Where(x => x.Id == filter.Id);
+            if(filter.DateStart != null)
+                query = query.Where(x => x.CreateDate.Date >= filter.DateStart.Value.Date);
+            if(filter.DateFinish != null)
+                query = query.Where(x => x.CreateDate.Date <= filter.DateFinish.Value.Date);
 
             int totalItems = await query.CountAsync();
 
