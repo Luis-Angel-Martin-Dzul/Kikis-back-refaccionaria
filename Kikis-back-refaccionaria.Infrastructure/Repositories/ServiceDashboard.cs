@@ -42,7 +42,7 @@ namespace Kikis_back_refaccionaria.Infrastructure.Repositories {
                 dashboard.Sales.InvoiceCount = salesList.Count(s => s.Invoice != 0);
                 dashboard.Sales.InvoicedIVA = salesList.Where(s => s.Invoice != 0).Sum(s => s.Iva);
                 dashboard.Sales.InvoicedTotal = invoices.Sum(s => s.Total);
-                dashboard.Sales.InvoicedPercentage = dashboard.Sales.InvoiceCount > 0 ? (invoices.Count * 100.0 / dashboard.Sales.InvoiceCount) : 0;
+                dashboard.Sales.InvoicedPercentage = dashboard.Sales.InvoiceCount > 0 ? (invoices.Count * 100.0 / salesList.Count()) : 0;
                 dashboard.Sales.NotInvoicedPercentage = 100 - dashboard.Sales.InvoicedPercentage;
 
 
