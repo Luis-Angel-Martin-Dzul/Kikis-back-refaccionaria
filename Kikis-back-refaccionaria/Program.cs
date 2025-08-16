@@ -36,6 +36,7 @@ builder.Services.AddTransient<IServiceEMail, ServiceEMail>();
 
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+builder.Services.AddTransient<IServiceDashboard, ServiceDashboard>();
 builder.Services.AddTransient<IServiceCatalogs, ServiceCatalogs>();
 builder.Services.AddTransient<IServiceClient, ServiceClient>();
 builder.Services.AddTransient<IServiceDelivery, ServiceDelivery>();
