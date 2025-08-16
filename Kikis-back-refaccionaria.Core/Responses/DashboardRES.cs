@@ -1,71 +1,50 @@
 ﻿namespace Kikis_back_refaccionaria.Core.Responses {
-    public class DashboardRES {
-        public SaleD2 Sale {
-            get; set;
-        }
-        public List<VentasDiaRES> VentasPorDia { get; set; } = new List<VentasDiaRES>();
+    public class GeneralSummary {
 
-        // Lista completa de vendedores
-        public List<VendedorRES> Vendedores { get; set; } = new List<VendedorRES>();
+        public SaleSummary Sales { get; set; }
 
-        // Top 3 vendedores
-        public List<VendedorRES> TopVendedores { get; set; } = new List<VendedorRES>();
+        public List<DailySalesSummary> DailySales { get; set; } = new List<DailySalesSummary>();
+
+        public List<SellerSummary> Sellers { get; set; } = new List<SellerSummary>();
+
+        public List<SellerSummary> TopSellers { get; set; } = new List<SellerSummary>();
     }
 
 
     // Métricas generales de ventas
-    public class SaleD2 {
-        public int CantidadVentas {
-            get; set;
-        }
-        public decimal Iva {
-            get; set;
-        }
-        public decimal Subtotal {
-            get; set;
-        }
-        public decimal Total {
-            get; set;
-        }
-        public decimal Cambio {
-            get; set;
-        }
-        public decimal TicketPromedio {
-            get; set;
-        }
-        public decimal PagoPromedio {
-            get; set;
-        }
-    }
-    public class VentasDiaRES {
-        public int Dia {
-            get; set;
-        }
-        public int NumeroVentas {
-            get; set;
-        }
+    public class SaleSummary {
 
-        public List<SaleRES> products {
-            get; set;
-        }
-    }
 
-    public class VendedorRES {
-        public int SellerId {
-            get; set;
-        }          // ID del vendedor
-        public string SellerName {
-            get; set;
-        }     // Nombre del vendedor
-        public int NumeroVentas {
-            get; set;
-        }      // Número total de ventas realizadas
-        public decimal TotalVentas {
-            get; set;
-        }   // Total vendido por el vendedor
-        public decimal TicketPromedio {
-            get; set;
-        } // Promedio de ticket de venta
+        //sale
+        public int QuantitySales { get; set; }
+        public decimal SalesSubtotal { get; set; }
+        public decimal SalesIVA { get; set; }
+        public decimal SalesTotal { get; set; }
+        public decimal SalesCambio { get; set; }
+        public decimal AverageTicket { get; set; }
+        public decimal AveragePayment { get; set; }
+
+        //factura
+        public int InvoiceCount { get; set; }
+        public decimal InvoicedIVA { get; set; }
+        public decimal InvoicedTotal { get; set; }
+
+        public double InvoicedPercentage { get; set; }
+        public double NotInvoicedPercentage { get; set; }
+    }
+    public class DailySalesSummary {
+
+        public int Day { get; set; }
+        public int SalesNumber { get; set; }
+        public List<SaleRES>? Sales { get; set; }
+    }
+    public class SellerSummary {
+
+        public int Id { get; set;}
+        public string? Name { get; set; }
+        public int SalesNumber { get; set;}
+        public decimal SalesTotal {get; set;}
+        public decimal AverageTicket { get; set; }
     }
 
 }
