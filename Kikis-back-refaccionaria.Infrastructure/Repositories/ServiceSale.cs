@@ -37,6 +37,8 @@ namespace Kikis_back_refaccionaria.Infrastructure.Repositories {
                 query = query.Where(x => x.CreateDate.Date >= filter.DateStart.Value.Date);
             if(filter.DateFinish != null)
                 query = query.Where(x => x.CreateDate.Date <= filter.DateFinish.Value.Date);
+            if(filter.IsInvoiced != null)
+                query = query.Where(sale => filter.IsInvoiced.Value ? sale.TbInvoices.Any() : !sale.TbInvoices.Any());
 
             int totalItems = await query.CountAsync();
 

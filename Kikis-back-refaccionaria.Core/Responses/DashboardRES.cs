@@ -36,7 +36,6 @@
 
         public int Day { get; set; }
         public int SalesNumber { get; set; }
-        public List<SaleRES>? Sales { get; set; }
     }
     public class SellerSummary {
 
