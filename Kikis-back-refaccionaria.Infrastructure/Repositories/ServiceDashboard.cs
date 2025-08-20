@@ -67,14 +67,28 @@ namespace Kikis_back_refaccionaria.Infrastructure.Repositories {
             }
 
             // 2️⃣ Ventas diarias
-            dashboard.DailySales = await query
-                .GroupBy(s => s.CreateDate.Date)
-                .OrderBy(g => g.Key)
-                .Select(g => new DailySalesSummary {
-                    Day = g.Key.Day,
-                    SalesNumber = g.Count()
-                })
-                .ToListAsync();
+            if(IsFullYear(filter)) {
+                
+                dashboard.DailySales = await query
+                    .GroupBy(s => new { s.CreateDate.Year, s.CreateDate.Month })
+                    .OrderBy(g => g.Key.Year).ThenBy(g => g.Key.Month)
+                    .Select(g => new DailySalesSummary {
+                        Day = g.Key.Month, // mes 1-12
+                        SalesNumber = g.Count()
+                    })
+                    .ToListAsync();
+            }
+            else {
+
+                dashboard.DailySales = await query
+                    .GroupBy(s => s.CreateDate.Date)
+                    .OrderBy(g => g.Key)
+                    .Select(g => new DailySalesSummary {
+                        Day = g.Key.Day,
+                        SalesNumber = g.Count()
+                    })
+                    .ToListAsync();
+            }
 
             // 3️⃣ Vendedores y top 3
             var sellers = await query
@@ -94,5 +108,17 @@ namespace Kikis_back_refaccionaria.Infrastructure.Repositories {
             return dashboard;
         }
 
+        public bool IsFullYear(SaleFilter filter) {
+
+            if(filter.DateStart == null || filter.DateFinish == null)
+                return false;
+
+            var start = filter.DateStart.Value;
+            var finish = filter.DateFinish.Value;
+
+            return start.Month == 1 && start.Day == 1 &&
+                   finish.Month == 12 && finish.Day == 31 &&
+                   start.Year == finish.Year;
+        }
     }
 }
