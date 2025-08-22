@@ -13,5 +13,7 @@
 
         public RolRES Rol { get; set; }
 
+        public string Token { get; set; }
+
     }
 }

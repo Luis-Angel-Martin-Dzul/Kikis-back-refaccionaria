@@ -2,16 +2,21 @@
 using Kikis_back_refaccionaria.Core.Interfaces;
 using Kikis_back_refaccionaria.Core.Request;
 using Kikis_back_refaccionaria.Core.Responses;
+using Kikis_back_refaccionaria.Infrastructure.Utilities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Kikis_back_refaccionaria.Controllers {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class UserController : ControllerBase {
 
         private readonly IServiceUser _service;
-        public UserController(IServiceUser service) {
+        private readonly IConfiguration _config;
+        public UserController(IServiceUser service, IConfiguration config) {
             _service = service;
+            _config = config;
         }
 
 
@@ -59,9 +64,11 @@ namespace Kikis_back_refaccionaria.Controllers {
         }
         [Route("auth/")]
         [HttpPost]
+        [AllowAnonymous]
         public async Task<IActionResult> Login(AuthREQ request) {
 
             var data = await _service.Login(request);
+            data.Token = JWToken.Generator(_config, data);
             var response = new ApiResponse<UserAuthRES>(data);
             return Ok(response);
         }

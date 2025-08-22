@@ -1,11 +1,13 @@
 ﻿using Kikis_back_refaccionaria.Core.Filters;
 using Kikis_back_refaccionaria.Core.Interfaces;
 using Kikis_back_refaccionaria.Core.Responses;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Kikis_back_refaccionaria.Controllers {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class SupplierController : ControllerBase {
 
         private readonly IServiceSupplier _service;

@@ -2,11 +2,13 @@
 using Kikis_back_refaccionaria.Core.Interfaces;
 using Kikis_back_refaccionaria.Core.Request;
 using Kikis_back_refaccionaria.Core.Responses;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Kikis_back_refaccionaria.Controllers {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class DeliveryController : ControllerBase {
 
         private readonly IServiceDelivery _service;
