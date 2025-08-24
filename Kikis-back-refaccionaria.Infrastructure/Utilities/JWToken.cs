@@ -23,7 +23,6 @@ namespace Kikis_back_refaccionaria.Infrastructure.Utilities {
                 new Claim("lastname", account.LastName),
                 new Claim("curp", account.Curp),
                 new Claim("email", account.Email),
-                new Claim("rol", JsonConvert.SerializeObject(account.Rol))
             };
 
             var token = new JwtSecurityToken(
