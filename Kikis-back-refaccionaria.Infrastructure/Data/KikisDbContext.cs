@@ -51,6 +51,8 @@ namespace Kikis_back_refaccionaria.Infrastructure.Data {
 
         public virtual DbSet<TbTrackStatus> TbTrackStatuses { get; set; }
 
+        public virtual DbSet<TbTransactionHistory> TbTransactionHistories { get; set; }
+
         public virtual DbSet<TbUser> TbUsers { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder) {
@@ -251,6 +253,11 @@ namespace Kikis_back_refaccionaria.Infrastructure.Data {
             });
 
             modelBuilder.Entity<TbTrackStatus>(entity => {
+                entity.HasKey(e => e.Id).HasName("PRIMARY");
+            });
+
+            modelBuilder.Entity<TbTransactionHistory>(entity =>
+            {
                 entity.HasKey(e => e.Id).HasName("PRIMARY");
             });
 

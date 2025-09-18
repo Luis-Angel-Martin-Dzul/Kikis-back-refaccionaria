@@ -3,6 +3,7 @@ using Kikis_back_refaccionaria.Core.Settings;
 using Kikis_back_refaccionaria.Infrastructure.Data;
 using Kikis_back_refaccionaria.Infrastructure.Filters;
 using Kikis_back_refaccionaria.Infrastructure.Repositories;
+using Kikis_back_refaccionaria.Infrastructure.Utilities;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -96,6 +97,8 @@ app.UseCors();
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.UseMiddleware<AuditMiddleware>();
 
 app.MapControllerRoute(
     name: "default",
