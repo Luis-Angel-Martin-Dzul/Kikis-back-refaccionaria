@@ -1,6 +1,7 @@
 ﻿using Kikis_back_refaccionaria.Core.Entities;
 using Kikis_back_refaccionaria.Infrastructure.Data;
 using Microsoft.AspNetCore.Http;
+using Newtonsoft.Json.Linq;
 using System.Text;
 
 namespace Kikis_back_refaccionaria.Infrastructure.Utilities {
@@ -19,10 +20,12 @@ namespace Kikis_back_refaccionaria.Infrastructure.Utilities {
             }
 
             // Captura información de la petición
+            var claimValue = context.User?.Claims.FirstOrDefault()?.Value;
+
             string ip = context.Connection.RemoteIpAddress?.ToString();
             string path = context.Request.Path;
             string method = context.Request.Method;
-            int user = int.Parse(context.User?.Claims.FirstOrDefault().Value);
+            int user = int.TryParse(claimValue, out var parsed) ? parsed : 0;
 
             // Leer cuerpo de la petición (opcional)
             context.Request.EnableBuffering();
@@ -30,6 +33,16 @@ namespace Kikis_back_refaccionaria.Infrastructure.Utilities {
             using(var reader = new StreamReader(context.Request.Body, Encoding.UTF8, detectEncodingFromByteOrderMarks: false, leaveOpen: true)) {
                 body = await reader.ReadToEndAsync();
                 context.Request.Body.Position = 0;
+            }
+
+            //validate product
+            var json = JObject.Parse(body);
+            var imgB64 = (string)json["imgB64"];
+
+            if(path == "/api/product/" && !String.IsNullOrEmpty(imgB64)) {
+
+                json["imgB64"] = "FILE";
+                body = json.ToString();
             }
 
             // Interceptar la respuesta
@@ -58,6 +71,7 @@ namespace Kikis_back_refaccionaria.Infrastructure.Utilities {
                     await responseBody.CopyToAsync(originalBodyStream);
                     throw;
                 }
+
 
                 // Guardar en la base de datos
                 var transaction = new TbTransactionHistory {
